@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1",
-    withCredentials: true, // Include cookies (for refreshToken)
+    baseURL: (import.meta as any).env.VITE_API_BASE_URL || "http://localhost:4010/api/v1",
+    withCredentials: true,
 });
 
 let isRefreshing = false;

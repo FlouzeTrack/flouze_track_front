@@ -1,9 +1,5 @@
-import {
-  Bell,
-  ChevronRight,
-  LogOut,
-  Settings,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bell, ChevronRight, LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,23 +17,44 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import API from "@/services/api";
+import { UserData } from "@/types/userData";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
+  const { logout } = useAuth();
   const navigate = useNavigate();
-  const user = {
-    name: "John Doe",
-    email: "john@example.com",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-  };
+  const { toast } = useToast();
+  const [user, setUser] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleLogout = () => {
-    // TODO: Implement real logout logic
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await API.get("/auth/me");
+        setUser(response.data);
+      } catch (error: any) {
+        console.error("Failed to fetch user data:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load user data",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  if (!user) return <div>loading</div>;
+    fetchUserData();
+  }, [toast]);
+
+  if (isLoading || !user) {
+    return <div>Loading...</div>;
+  }
+
+  const displayName = user.name || user.email.split("@")[0];
 
   return (
     <SidebarMenu>
@@ -49,20 +66,16 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  src={user.image}
+                {/* <AvatarImage
+                  src={avatarUrl}
                   alt={`Profile picture of ${user.name}`}
-                />
+                /> */}
                 <AvatarFallback className="rounded-lg">
-                  {user.name
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase() ?? "U"}
+                  {displayName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
+                <span className="truncate font-semibold">{displayName}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronRight className="ml-auto size-4" />
@@ -77,16 +90,16 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
+                  {/* <AvatarImage
                     src={user.image}
-                    alt={`Profile picture of ${user.name}`}
-                  />
+                    alt={`Profile picture of ${displayName}`}
+                  /> */}
                   <AvatarFallback className="rounded-lg">
-                    {user.name?.charAt(0).toUpperCase()}
+                    {displayName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
+                  <span className="truncate font-semibold">{displayName}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
@@ -103,7 +116,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={() => logout()}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Déconnexion</span>
             </DropdownMenuItem>

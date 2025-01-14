@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LoadingSpinner from "./components/LoadingSpinner"; // Assuming you have a loading spinner component
+import LoadingSpinner from "./components/LoadingSpinner";
 import { Toaster } from "./components/ui/toaster";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { AppSidebar } from "./components/ui/AppSidebar";
@@ -15,6 +15,8 @@ import { useSidebarState } from "./hooks/useSidebarState";
 import { Header } from "./components/section/Header";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "./providers/ThemeProvider";
+import { useAuth } from "./hooks/useAuth";
+import { Navigate } from "react-router-dom";
 
 // Lazy-loaded components
 const Home = React.lazy(() => import("./pages/Home"));
@@ -28,34 +30,39 @@ const Wallet = React.lazy(() => import("./pages/Wallet"));
 const Profile = React.lazy(() => import("./pages/Profile"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
-const PublicLayout = () => (
-  <>
-    <Outlet />
-  </>
-);
+const PublicLayout = () => {
+  const { user } = useAuth();
 
+  if (user) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return <Outlet />;
+};
 const DashboardLayout = () => {
   const [defaultOpen] = useSidebarState();
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <div className="flex h-screen w-full overflow-hidden">
-        <div className="h-full shrink-0">
-          <AppSidebar />
+    <ProtectedRoute>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <div className="flex h-screen w-full overflow-hidden">
+          <div className="h-full shrink-0">
+            <AppSidebar />
+          </div>
+          <div
+            className={cn(
+              "flex flex-col flex-1 transition-all duration-300 ease-in-out",
+              defaultOpen ? "w-[calc(100%-16rem)]" : "w-[calc(100%-3rem)]"
+            )}
+          >
+            <Header />
+            <main className="flex-1 overflow-y-auto p-4">
+              <Outlet />
+            </main>
+          </div>
         </div>
-        <div
-          className={cn(
-            "flex flex-col flex-1 transition-all duration-300 ease-in-out",
-            defaultOpen ? "w-[calc(100%-16rem)]" : "w-[calc(100%-3rem)]"
-          )}
-        >
-          <Header />
-          <main className="flex-1 overflow-y-auto p-4">
-            <Outlet />
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 };
 
@@ -72,16 +79,16 @@ const App = () => (
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email/:token" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route
-                path="/reset-password/:token"
-                element={<ResetPassword />}
-              />
             </Route>
 
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/wallet" element={<Wallet />} />
               <Route path="/profile" element={<Profile />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
             </Route>
 
             <Route path="*" element={<NotFound />} />

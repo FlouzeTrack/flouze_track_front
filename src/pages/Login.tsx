@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import AuthForm from "@/components/authForm/AuthForm";
+import API from "@/services/api";
+import { useAuth } from "@/hooks/useAuth";
 
 const image = "/login_picture.jpeg";
 
@@ -24,9 +26,10 @@ const formSchema = z.object({
   }),
 });
 
-export default function SignUp() {
+export default function SignIn() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
@@ -54,23 +57,34 @@ export default function SignUp() {
     async (values: FormValues) => {
       setIsLoading(true);
       try {
-        toast({
-          title: "Login successful",
-          description: `Welcome, ${values.email}!`,
+        const response = await API.post("/auth/signin", {
+          email: values.email,
+          password: values.password,
         });
-        navigate("/dashboard");
-      } catch (error) {
-        console.error("err", error);
+
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+          login(); // Update auth context
+
+          toast({
+            title: "Login successful",
+            description: `Welcome back!`,
+          });
+
+          navigate("/dashboard");
+        }
+      } catch (error: any) {
+        console.error("Login failed:", error);
         toast({
           variant: "destructive",
           title: "Login failed",
-          description: `Error: ${(error as Error).message}`,
+          description: error.response?.data?.message || "Invalid credentials",
         });
       } finally {
         setIsLoading(false);
       }
     },
-    [navigate, toast]
+    [navigate, toast, login]
   );
 
   return (
