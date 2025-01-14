@@ -11,7 +11,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { items } from "@/components/ui/AppSidebar";
 import { cn } from "@/lib/utils";
 import { Fragment } from "react";
-// import { ThemeToggle } from "../ui/ThemeToggle";
+import { ThemeToggle } from "../ui/ThemeToggle";
 
 export function Header() {
   const location = useLocation();
@@ -110,7 +110,7 @@ export function Header() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* <ThemeToggle /> */}
+        <ThemeToggle />
       </div>
     </header>
   );
