@@ -1,0 +1,15 @@
+{
+  "common": {
+    "dashboard": "Tableau de bord",
+    "wallet": "Portefeuille",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "language": "Langue"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "forgotPassword": "Mot de passe oublié"
+  }
+}
