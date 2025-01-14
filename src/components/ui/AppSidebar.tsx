@@ -11,7 +11,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { ChevronRight, LayoutDashboard, Wallet} from "lucide-react";
+import { ChevronRight, LayoutDashboard, Wallet } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Collapsible,
@@ -36,7 +36,7 @@ type MenuItem = {
 export const items: MenuItem[] = [
   {
     title: "common.dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -45,13 +45,11 @@ export const items: MenuItem[] = [
     icon: Wallet,
   },
 ];
-
 export function AppSidebar() {
   const { t } = useTranslation();
   const location = useLocation();
-  const basePath = location.pathname.split("/")[1];
 
-  const translatedItems = items.map(item => ({
+  const translatedItems = items.map((item) => ({
     ...item,
     title: t(item.title),
   }));
@@ -60,9 +58,7 @@ export function AppSidebar() {
     const currentPath = location.pathname.endsWith("/")
       ? location.pathname.slice(0, -1)
       : location.pathname;
-    if (itemUrl === "/" && currentPath === `/${basePath}`) return true;
-    const targetPath = `/${basePath}${itemUrl}`;
-    return currentPath === targetPath;
+    return currentPath === itemUrl;
   };
 
   return (
@@ -107,7 +103,7 @@ export function AppSidebar() {
                                 isActive={isLinkActive(subItem.url)}
                               >
                                 <Link
-                                  to={`/${basePath}${subItem.url}`}
+                                  to={subItem.url}
                                   className={cn(
                                     isLinkActive(subItem.url) && "font-semibold"
                                   )}
@@ -134,10 +130,7 @@ export function AppSidebar() {
                         "bg-accent text-accent-foreground font-semibold"
                     )}
                   >
-                    <Link
-                      to={`/${basePath}${item.url}`}
-                      className="flex items-center gap-2"
-                    >
+                    <Link to={item.url} className="flex items-center gap-2">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </Link>
