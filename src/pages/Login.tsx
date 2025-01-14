@@ -1,82 +1,105 @@
-import React, { useState } from "react";
-import API from "../services/api";
-import { useAuth } from "../hooks/useAuth";
-import { Navigate } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
+import AuthForm from "@/components/authForm/AuthForm";
 
-const Login = () => {
-    const { user, login } = useAuth();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+const image = "/login_picture.jpeg";
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!email || !password) {
-            setError("Please fill in all fields");
-            return;
-        }
-        if (!/\S+@\S+\.\S+/.test(email)) {
-            setError("Please enter a valid email address");
-            return;
-        }
-        setIsLoading(true);
-        try {
-            const { data } = await API.post("/auth/login", { email, password });
-            login();
-            localStorage.setItem("token", data.accessToken);
-        } catch (error) {
-            console.error("Login failed", error);
-            setError("Invalid email or password");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+type FormErrors = Record<string, { message?: string }>;
 
-    if (user) {
-        return <Navigate to="/dashboard" />;
-    }
-
-    return (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 space-y-4">
-            <h1 className="text-2xl font-bold">Login</h1>
-            {error && <p className="text-red-500">{error}</p>}
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 border rounded"
-            />
-            <div className="relative">
-                <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2 border rounded"
-                />
-                <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-2 text-sm text-blue-500"
-                >
-                    {showPassword ? "Hide" : "Show"}
-                </button>
-            </div>
-            <a href="/forgot-password" className="text-sm text-blue-500">
-                Forgot password?
-            </a>
-            <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-blue-500 text-white p-2 rounded disabled:bg-blue-300"
-            >
-                {isLoading ? "Logging in..." : "Login"}
-            </button>
-        </form>
-    );
+type FormValues = {
+  email: string;
+  password: string;
 };
 
-export default Login;
+const formSchema = z.object({
+  email: z.string().email({
+    message: "Email must be a valid email address.",
+  }),
+  password: z.string().min(8, {
+    message: "Password must be at least 8 characters.",
+  }),
+});
+
+export default function SignUp() {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onError = useCallback(
+    (errors: FormErrors) => {
+      Object.values(errors).forEach((error) => {
+        toast({
+          variant: "destructive",
+          title: "Form submission failed",
+          description: error.message,
+        });
+      });
+    },
+    [toast]
+  );
+
+  const onSubmit = useCallback(
+    async (values: FormValues) => {
+      try {
+        toast({
+          title: "Login successful",
+          description: `Welcome, ${values.email}!`,
+        });
+        navigate("/dashboard");
+      } catch (error) {
+        console.error("err", error);
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: `Error: ${(error as Error).message}`,
+        });
+      }
+    },
+    [navigate, toast]
+  );
+
+  return (
+    <AuthForm<FormValues>
+      title="Login"
+      description="Enter your details to login to your account"
+      fields={[
+        {
+          label: "Email",
+          type: "email",
+          id: "email",
+          placeholder: "johndoe@gmail.com",
+          name: "email",
+        },
+        {
+          label: "Password",
+          type: "password",
+          id: "password",
+          placeholder: "",
+          name: "password",
+        },
+      ]}
+      form={form}
+      onSubmit={onSubmit}
+      onError={onError}
+      isLoading={isLoading}
+      image={image}
+      buttonText="Register"
+      redirectText="Didn't have an account? "
+      redirectButton="Register"
+      redirectLink="/register"
+      reverseGrid={false}
+    />
+  );
+}

@@ -6,9 +6,9 @@ import {
   Outlet,
 } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
-import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LoadingSpinner from "./components/LoadingSpinner";
+import LoadingSpinner from "./components/LoadingSpinner"; // Assuming you have a loading spinner component
+import { Toaster } from "./components/ui/toaster";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { AppSidebar } from "./components/ui/AppSidebar";
 import { useSidebarState } from "./hooks/useSidebarState";
@@ -30,7 +30,6 @@ const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const PublicLayout = () => (
   <>
-    <Navbar />
     <Outlet />
   </>
 );
@@ -63,6 +62,7 @@ const DashboardLayout = () => {
 const App = () => (
   <ThemeProvider defaultTheme="system" storageKey="ui-theme">
     <AuthProvider>
+      <Toaster />
       <Router>
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
