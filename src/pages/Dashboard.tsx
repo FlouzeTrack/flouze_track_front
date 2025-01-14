@@ -9,8 +9,9 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import API from "services/api";
+import API from "../services/api";
 import { Line } from "react-chartjs-2";
+import { Button } from "@/components/ui/button";
 
 ChartJS.register(
     CategoryScale,
@@ -102,8 +103,9 @@ const Dashboard = () => {
     };
 
     return (
-        <div style={{ padding: "2rem" }} className="bg-gray-50 min-h-screen">
+        <div style={{ padding: "2rem" }} className="bg-primary-50 min-h-screen">
             <h1 className="text-3xl font-bold text-center mb-8">Crypto Wallet</h1>
+            <Button>Hello shadcn</Button>
             {isLoading && (
                 <div className="flex justify-center items-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
