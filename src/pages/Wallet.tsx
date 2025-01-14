@@ -104,7 +104,7 @@ const Dashboard = () => {
 
     return (
         <div>
-            <h1 className="text-3xl font-bold mb-8">Crypto dashboard</h1>
+            <h1 className="text-3xl font-bold mb-8">Crypto wallet</h1>
             <Button>Hello shadcn</Button>
             {isLoading && (
                 <div className="flex justify-center items-center">
