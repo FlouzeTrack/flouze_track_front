@@ -14,6 +14,7 @@ import { AppSidebar } from "./components/ui/AppSidebar";
 import { useSidebarState } from "./hooks/useSidebarState";
 import { Header } from "./components/section/Header";
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "./providers/ThemeProvider";
 
 // Lazy-loaded components
 const Home = React.lazy(() => import("./pages/Home"));
@@ -60,30 +61,35 @@ const DashboardLayout = () => {
 };
 
 const App = () => (
-  <AuthProvider>
-    <Router>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/verify-email/:token" element={<VerifyEmail />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-          </Route>
+  <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+    <AuthProvider>
+      <Router>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/verify-email/:token" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
+            </Route>
 
-          <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/wallet" element={<Wallet />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/wallet" element={<Wallet />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </Router>
-  </AuthProvider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </AuthProvider>
+  </ThemeProvider>
 );
 
 export default App;
