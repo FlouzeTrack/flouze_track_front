@@ -52,6 +52,7 @@ export default function SignUp() {
 
   const onSubmit = useCallback(
     async (values: FormValues) => {
+      setIsLoading(true);
       try {
         toast({
           title: "Login successful",
@@ -65,6 +66,8 @@ export default function SignUp() {
           title: "Login failed",
           description: `Error: ${(error as Error).message}`,
         });
+      } finally {
+        setIsLoading(false);
       }
     },
     [navigate, toast]
