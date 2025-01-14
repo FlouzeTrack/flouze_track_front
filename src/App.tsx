@@ -1,9 +1,9 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
-import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingSpinner from "./components/LoadingSpinner"; // Assuming you have a loading spinner component
+import { Toaster } from "./components/ui/toaster";
 
 // Lazy-loaded components
 const Home = React.lazy(() => import("./pages/Home"));
@@ -18,8 +18,8 @@ const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const App = () => (
   <AuthProvider>
+    <Toaster />
     <Router>
-      <Navbar />
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<Home />} />
