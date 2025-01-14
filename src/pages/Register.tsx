@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import AuthForm from "@/components/authForm/AuthForm";
+import API from "@/services/api";
+import { useAuth } from "@/hooks/useAuth";
 
 const image = "/register_picture.png";
 
@@ -34,6 +36,7 @@ const formSchema = z
 export default function SignUp() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
@@ -62,23 +65,37 @@ export default function SignUp() {
     async (values: FormValues) => {
       setIsLoading(true);
       try {
+        const response = await API.post("/auth/signup", {
+          email: values.email,
+          password: values.password,
+        });
+
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+          login(); // Update auth context
+        }
+
         toast({
           title: "Sign up successful",
-          description: `Welcome, ${values.email}!`,
+          description: "Your account has been created successfully!",
         });
+
+        // Redirect to dashboard or login page
         navigate("/login");
-      } catch (error) {
-        console.error("err", error);
+      } catch (error: any) {
+        console.error("Registration failed:", error);
         toast({
           variant: "destructive",
-          title: "Sign up failed",
-          description: `Error: ${(error as Error).message}`,
+          title: "Registration failed",
+          description:
+            error.response?.data?.message ||
+            "An error occurred during registration",
         });
       } finally {
         setIsLoading(false);
       }
     },
-    [navigate, toast]
+    [navigate, toast, login]
   );
 
   return (
