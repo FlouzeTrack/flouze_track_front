@@ -1,4 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,8 +13,10 @@ import { items } from "@/components/ui/AppSidebar";
 import { cn } from "@/lib/utils";
 import { Fragment } from "react";
 import { ThemeToggle } from "../ui/ThemeToggle";
+import { LanguageToggle } from "../ui/LanguageToggle";
 
 export function Header() {
+  const { t } = useTranslation();
   const location = useLocation();
   const pathname = location.pathname;
   const segments = pathname?.split("/").filter(Boolean) || [];
@@ -28,10 +31,18 @@ export function Header() {
 
     const currentUrl = `/${segments.slice(0, index + 1).join("/")}`;
 
+    const segmentTranslations: Record<string, string> = {
+      dashboard: t("common.dashboard"),
+      wallet: t("common.wallet"),
+      profile: t("common.profile"),
+    };
+
     const flatMenu = items.flatMap((item) => [
-      { title: item.title, url: item.url, icon: item.icon },
-      ...(item.submenu?.map((sub) => ({ title: sub.title, url: sub.url })) ||
-        []),
+      { title: t(item.title), url: item.url, icon: item.icon },
+      ...(item.submenu?.map((sub) => ({
+        title: t(sub.title),
+        url: sub.url,
+      })) || []),
     ]);
 
     const match = flatMenu.find((item) => item.url === currentUrl);
@@ -42,8 +53,11 @@ export function Header() {
       };
     }
 
+    // Add fallback return for non-matched cases
     return {
-      title: segment.charAt(0).toUpperCase() + segment.slice(1),
+      title:
+        segmentTranslations[segment] ||
+        segment.charAt(0).toUpperCase() + segment.slice(1),
       icon: undefined,
     };
   };
@@ -71,7 +85,7 @@ export function Header() {
                   aria-current={isRoot ? "page" : undefined}
                 >
                   {homeItem.icon && <homeItem.icon className="h-4 w-4" />}
-                  <span>{homeItem.title}</span>
+                  <span>{t(homeItem.title)}</span>
                 </Link>
               </BreadcrumbItem>
             )}
@@ -110,7 +124,10 @@ export function Header() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <LanguageToggle />
+        </div>
       </div>
     </header>
   );

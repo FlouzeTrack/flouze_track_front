@@ -1,0 +1,15 @@
+{
+  "common": {
+    "dashboard": "Dashboard",
+    "wallet": "Wallet",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "forgotPassword": "Forgot Password"
+  }
+}

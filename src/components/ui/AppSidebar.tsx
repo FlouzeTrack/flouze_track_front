@@ -1,5 +1,4 @@
-"use client";
-
+import { useTranslation } from "react-i18next";
 import {
   Sidebar,
   SidebarContent,
@@ -33,22 +32,29 @@ type MenuItem = {
   }[];
 };
 
+// Export the items array
 export const items: MenuItem[] = [
   {
-    title: "Dashboard",
+    title: "common.dashboard",
     url: "/",
     icon: LayoutDashboard,
   },
   {
-    title: "Wallet",
+    title: "common.wallet",
     url: "/wallet",
     icon: Wallet,
   },
 ];
 
 export function AppSidebar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const basePath = location.pathname.split("/")[1];
+
+  const translatedItems = items.map(item => ({
+    ...item,
+    title: t(item.title),
+  }));
 
   const isLinkActive = (itemUrl: string) => {
     const currentPath = location.pathname.endsWith("/")
@@ -67,7 +73,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {items.map((item) => {
+            {translatedItems.map((item) => {
               const isActive = isLinkActive(item.url);
 
               if (item.submenu) {
