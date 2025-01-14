@@ -80,7 +80,7 @@ const App = () => (
 
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard/wallet" element={<Wallet />} />
+              <Route path="/wallet" element={<Wallet />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
 
