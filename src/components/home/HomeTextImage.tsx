@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 
 interface HomeTextImageProps {
   title: string;
@@ -32,8 +33,8 @@ export const HomeTextImage = ({
         </Button>
       )}
     </div>
-    <div className="flex flex-col gap-4 mx-auto">
-      <img src={imgSrc} alt={imgAlt} className="w-full h-full bg-black" />
-    </div>
+    <Card className="w-full h-full">
+      <img src={imgSrc} alt={imgAlt} className="w-full h-full bg-cover" />
+    </Card>
   </div>
 );
