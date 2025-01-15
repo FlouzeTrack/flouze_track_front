@@ -7,6 +7,47 @@
     "logout": "Logout",
     "language": "Language"
   },
+  "home": {
+    "login": "Login",
+    "register": "Register",
+    "allRightsReserved": "All rights reserved.",
+    "heroBanner": {
+      "title": "Simplify Cryptocurrency Management",
+      "description": "Track your assets, analyze trends, and make informed decisions with our intuitive crypto dashboard. Easy management, all in one place.",
+      "cta": "Get Started"
+    },
+    "textImage": [
+      {
+        "title": "Simplified Portfolio Management",
+        "description": "Securely connect your wallets and exchanges. Visualize your investment distribution, track your profits and losses, and plan long-term strategies with accurate data.",
+        "cta": ""
+      },
+      {
+        "title": "Analyze Your Trends",
+        "description": "Analyze your trends and make informed decisions to maximize your profits.",
+        "cta": "Learn More"
+      },
+      {
+        "title": "A Detailed View of Your Activities",
+        "description": "Access the complete history of your transactions. Keep track of purchases, sales, and transfers for easy and accurate accounting.",
+        "cta": ""
+      }
+    ],
+    "reassurance": {
+      "security": {
+        "title": "Security",
+        "description": "Your data is encrypted and protected with advanced protocols."
+      },
+      "support": {
+        "title": "Support",
+        "description": "24/7 assistance to answer all your questions."
+      },
+      "trust": {
+        "title": "Trust",
+        "description": "Thousands of users trust us every day."
+      }
+    }
+  },
   "auth": {
     "login": "Login",
     "register": "Register",
