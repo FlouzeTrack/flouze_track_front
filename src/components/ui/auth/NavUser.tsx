@@ -19,7 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import API from "@/services/api";
+import { AuthAPI } from "@/services/api";
 import { UserData } from "@/types/userData";
 
 export function NavUser() {
@@ -33,7 +33,7 @@ export function NavUser() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await API.get("/auth/me");
+        const response = await AuthAPI.get("/auth/me");
         setUser(response.data);
       } catch (error: any) {
         console.error("Failed to fetch user data:", error);

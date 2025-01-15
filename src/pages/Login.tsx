@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import AuthForm from "@/components/authForm/AuthForm";
-import API from "@/services/api";
+import { AuthAPI } from "@/services/api";
 import { useAuth } from "@/hooks/useAuth";
 
 const image = "/login_picture.jpeg";
@@ -57,7 +57,7 @@ export default function SignIn() {
     async (values: FormValues) => {
       setIsLoading(true);
       try {
-        const response = await API.post("/auth/signin", {
+        const response = await AuthAPI.post("/auth/signin", {
           email: values.email,
           password: values.password,
         });
