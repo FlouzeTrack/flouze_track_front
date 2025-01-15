@@ -43,7 +43,7 @@ const DashboardLayout = () => {
   const [defaultOpen] = useSidebarState();
 
   return (
-    <ProtectedRoute>
+    // <ProtectedRoute>
       <SidebarProvider defaultOpen={defaultOpen}>
         <div className="flex h-screen w-full overflow-hidden">
           <div className="h-full shrink-0">
@@ -62,7 +62,7 @@ const DashboardLayout = () => {
           </div>
         </div>
       </SidebarProvider>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   );
 };
 
