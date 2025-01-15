@@ -51,6 +51,10 @@
   "auth": {
     "login": "Connexion",
     "register": "Inscription",
-    "forgotPassword": "Mot de passe oublié"
+    "forgotPassword": "Mot de passe oublié",
+    "errorInvalidEmail": "Veuillez saisir une adresse électronique valide",
+    "errorSendFailed": "Échec de l'envoi du lien de réinitialisation du mot de passe. Veuillez réessayer.",
+    "sendResetPassword": "Envoyer le lien de réinitialisation",
+    "sending": "En cours d'envoi..."
   }
 }

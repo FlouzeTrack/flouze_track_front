@@ -112,7 +112,8 @@ export default function SignIn() {
       onError={onError}
       isLoading={isLoading}
       image={image}
-      buttonText="Register"
+      buttonText="Login"
+      forgotPassword={true}
       redirectText="Didn't have an account? "
       redirectButton="Register"
       redirectLink="/register"

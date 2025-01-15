@@ -23,6 +23,7 @@ interface AuthFormProps<V extends FieldValues> {
   isLoading: boolean;
   image: string;
   buttonText: string;
+  forgotPassword?: boolean;
   redirectText: string;
   redirectButton: string;
   redirectLink: string;
@@ -39,6 +40,7 @@ export default function AuthForm<V extends FieldValues>({
   isLoading,
   image,
   buttonText,
+  forgotPassword,
   redirectText,
   redirectButton,
   redirectLink,
@@ -86,6 +88,14 @@ export default function AuthForm<V extends FieldValues>({
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {buttonText}
               </Button>
+              {forgotPassword && (
+                <NavLink
+                  to="/forgot-password"
+                  className="text-sm text-card-foreground"
+                >
+                  Forgot password?
+                </NavLink>
+              )}
             </form>
             <div className="mt-4 text-center text-sm">
               {redirectText}
@@ -99,7 +109,7 @@ export default function AuthForm<V extends FieldValues>({
       <div className="hidden bg-muted lg:block">
         <img
           src={image}
-          alt="Paris 2024"
+          alt="ETH picture"
           width="1920"
           height="1080"
           className="h-full w-full object-cover"
