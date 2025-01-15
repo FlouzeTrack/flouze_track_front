@@ -5,7 +5,7 @@ export function HomeReassurance() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-secondary-foreground text-primary-foreground py-8 px-4 rounded-3xl">
+    <div className="bg-card text-secondary-foreground py-8 px-4 rounded-3xl border border-gray-750 ">
       <div className="grid grid-cols-3 gap-8 text-center">
         <div className="flex flex-col items-center mx-4">
           <EarthLock width={40} height={40} />
