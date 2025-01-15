@@ -7,6 +7,47 @@
     "logout": "Déconnexion",
     "language": "Langue"
   },
+  "home": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "allRightsReserved": "Tous droits réservés.",
+    "heroBanner": {
+      "title": "Simplifiez la gestion de vos cryptomonnaies",
+      "description": "Suivez vos actifs, analysez vos tendances et prenez des décisions éclairées avec notre tableau de bord crypto intuitif. Gestion facile, tout en un endroit.",
+      "cta": "Commencer"
+    },
+    "textImage": [
+      {
+        "title": "Gestion de portefeuille simplifiée",
+        "description": "Connectez vos portefeuilles et échanges en toute sécurité. Visualisez la répartition de vos investissements, suivez vos profits et pertes, et planifiez vos stratégies à long terme avec des données précises.",
+        "cta": ""
+      },
+      {
+        "title": "Analysez vos tendances",
+        "description": "Analysez vos tendances et prenez des décisions éclairées pour maximiser vos profits.",
+        "cta": "En savoir plus"
+      },
+      {
+        "title": "Une vue détaillée de vos activités",
+        "description": "Consultez l’historique complet de vos transactions. Gardez une trace des achats, des ventes et des transferts pour une comptabilité facile et précise.",
+        "cta": ""
+      }
+    ],
+    "reassurance": {
+      "security": {
+        "title": "Sécurité",
+        "description": "Vos données sont cryptées et protégées avec des protocoles de pointe."
+      },
+      "support": {
+        "title": "Support",
+        "description": "Une assistance 24/7 pour répondre à toutes vos questions."
+      },
+      "trust": {
+        "title": "Confiance",
+        "description": "Des milliers d'utilisateurs nous font confiance chaque jour."
+      }
+    }
+  },
   "auth": {
     "login": "Connexion",
     "register": "Inscription",
