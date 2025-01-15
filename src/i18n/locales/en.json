@@ -51,6 +51,10 @@
   "auth": {
     "login": "Login",
     "register": "Register",
-    "forgotPassword": "Forgot Password"
+    "forgotPassword": "Forgot Password",
+    "errorInvalidEmail": "Please enter a valid email address.",
+    "errorSendFailed": "Failed to send reset password link. Please try again.",
+    "sendResetPassword": "Send reset password link",
+    "sending": "Sending..."
   }
 }
