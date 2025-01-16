@@ -1,7 +1,10 @@
 // src/hooks/fetch/useWalletBalance.tsx
 import { useState, useEffect } from "react";
 import { API } from "@/services/api";
-import { BalanceHistoryResponse, FormattedBalance } from "@/types/ethereumBalancesData";
+import {
+  BalanceHistoryResponse,
+  FormattedBalance,
+} from "@/types/ethereumBalancesData";
 import { EthereumMapper } from "@/mappers/ethereumMapper";
 
 interface WalletBalanceParams {
@@ -17,6 +20,9 @@ export const useWalletBalance = (
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  if(!params) {
+    return null;
+  }
   const fetchData = async () => {
     try {
       setIsLoading(true);
