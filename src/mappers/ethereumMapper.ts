@@ -25,6 +25,21 @@ export class EthereumMapper {
     });
   }
 
+  static formatDateRange(start: Date | string, end: Date | string): string {
+    const formatDate = (date: Date | string) => {
+      return new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    };
+
+    const startDate = formatDate(start);
+    const endDate = formatDate(end);
+
+    return `from ${startDate} to ${endDate}`;
+  }
+
   static getTimestamp(dateString: string): number {
     return new Date(dateString).getTime();
   }
@@ -43,5 +58,9 @@ export class EthereumMapper {
       min: minEth - padding,
       max: maxEth + padding,
     };
+  }
+
+  static formatWalletAddress(address: string): string {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   }
 }

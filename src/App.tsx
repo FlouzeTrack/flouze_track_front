@@ -43,7 +43,7 @@ const DashboardLayout = () => {
   const [defaultOpen] = useSidebarState();
 
   return (
-    // <ProtectedRoute>
+    <ProtectedRoute>
       <SidebarProvider defaultOpen={defaultOpen}>
         <div className="flex h-screen w-full overflow-hidden">
           <div className="h-full shrink-0">
@@ -62,7 +62,7 @@ const DashboardLayout = () => {
           </div>
         </div>
       </SidebarProvider>
-    // </ProtectedRoute>
+    </ProtectedRoute>
   );
 };
 
@@ -79,16 +79,16 @@ const App = () => (
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email/:token" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
             </Route>
 
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/wallet" element={<Wallet />} />
               <Route path="/profile" element={<Profile />} />
-              <Route
-                path="/reset-password/:token"
-                element={<ResetPassword />}
-              />
             </Route>
 
             <Route path="*" element={<NotFound />} />

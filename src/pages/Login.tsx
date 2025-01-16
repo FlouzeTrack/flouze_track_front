@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import AuthForm from "@/components/authForm/AuthForm";
 import { AuthAPI } from "@/services/api";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,7 +27,6 @@ const formSchema = z.object({
 });
 
 export default function SignIn() {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -75,11 +74,10 @@ export default function SignIn() {
           navigate("/dashboard");
         }
       } catch (error: any) {
-        console.error("Login failed:", error);
         toast({
           variant: "destructive",
           title: "Login failed",
-          description: error.response?.data?.message || "Invalid credentials",
+          description: error.response?.data?.error || "Invalid credentials",
         });
       } finally {
         setIsLoading(false);

@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import API from "../services/api";
-import { Card } from "@/components/ui/card";
-import { ArrowBigLeft, ArrowLeft, Bitcoin } from "lucide-react";
+import { Bitcoin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 const ForgotPassword = () => {
   const { t } = useTranslation();
@@ -16,6 +15,7 @@ const ForgotPassword = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    error && setError("");
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setError(t("auth.errorInvalidEmail"));
       return;
@@ -24,10 +24,17 @@ const ForgotPassword = () => {
     try {
       const { data } = await API.post("/auth/forgot-password", { email });
       setMessage(data.message);
+      toast({
+        title: msg,
+        variant: "default",
+      });
       setError("");
     } catch (error) {
-      console.error("Failed to send reset password link:", error);
       setError(t("auth.errorSendFailed"));
+      toast({
+        title: t("auth.errorSendFailed"),
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -43,13 +50,6 @@ const ForgotPassword = () => {
             </div>
             FlouzeTrack
           </a>
-          <NavLink
-            to="/login"
-            className="text-sm text-card-foreground mr-auto flex items-center gap-2"
-          >
-            <ArrowLeft />
-            Return to login
-          </NavLink>
         </div>
         <div className={`flex flex-1 items-center justify-center py-12`}>
           <div className="mx-auto grid w-[350px] gap-6">
@@ -58,18 +58,6 @@ const ForgotPassword = () => {
                 {t("auth.forgotPassword")}
               </h1>
             </div>
-            {msg && (
-              <div className="text-green-500 bg-green-50 p-2 rounded-md flex items-center mb-4">
-                <span>✅</span>
-                <span className="ml-2">{msg}</span>
-              </div>
-            )}
-            {error && (
-              <Card className="text-red-500 bg-red-50 p-2 rounded-md flex items-center">
-                <span>❌</span>
-                <span className="ml-2">{error}</span>
-              </Card>
-            )}
             <form
               onSubmit={handleSubmit}
               className="space-y-4"
