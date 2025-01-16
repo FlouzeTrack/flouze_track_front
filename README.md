@@ -50,12 +50,6 @@ curl -X GET "http://localhost:3000/api/v1/wallet_id" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
-Using Postman:
-
-1. Import the Postman collection from `docs/postman/flouzetrack-api.json`
-2. Set up environment variables for `API_URL` and `AUTH_TOKEN`
-3. Use the pre-configured requests
-
 ## Features
 
 - 🔐 Authentication system
