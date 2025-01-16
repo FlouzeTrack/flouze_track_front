@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../services/api";
-import { ArrowLeft, Bitcoin } from "lucide-react";
+import { Bitcoin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -13,6 +14,23 @@ const ResetPassword = () => {
   });
   const [errors, setErrors] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const urlToken = window.location.pathname.split("/").pop();
+
+    if (urlToken) {
+      setToken(urlToken);
+      localStorage.setItem("token", urlToken);
+    } else {
+      const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        setToken(storedToken);
+      } else {
+        navigate("/login");
+      }
+    }
+  }, []);
 
   const validatePassword = (password: string) => {
     const minLength = 8;
@@ -48,26 +66,38 @@ const ResetPassword = () => {
     const passwordError = validatePassword(formData.password);
     if (passwordError) {
       setErrors(passwordError);
+      toast({
+        title: passwordError,
+        variant: "destructive",
+      });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       setErrors("Passwords do not match.");
+      toast({
+        title: "Passwords do not match.",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsLoading(true);
     try {
       const { password } = formData;
-      const token = window.location.pathname.split("/").pop();
+
+      if (!token) {
+        throw new Error("No reset token found");
+      }
+
       await API.post("/auth/reset-password", { password, token });
       navigate("/login");
     } catch (error: any) {
-      console.error("Reset password failed:", error);
-      setErrors(
-        error.response?.data?.message ||
-          "Failed to reset password. Please try again."
-      );
+      setErrors(error.response?.data?.message || "Reset password failed.");
+      toast({
+        title: error.reponse?.data?.message || "Reset password failed.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -83,13 +113,6 @@ const ResetPassword = () => {
             </div>
             FlouzeTrack
           </a>
-          <NavLink
-            to="/login"
-            className="text-sm text-card-foreground mr-auto flex items-center gap-2"
-          >
-            <ArrowLeft />
-            Return to login
-          </NavLink>
         </div>
         <div className={`flex flex-1 items-center justify-center py-12`}>
           <div className="mx-auto grid w-[350px] gap-6">
