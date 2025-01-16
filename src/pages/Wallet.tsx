@@ -87,7 +87,10 @@ const Wallet = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
             <CardTitle>ETH Balance History</CardTitle>
-            <CardDescription>Balance evolution over time</CardDescription>
+            <CardDescription>
+              Balance evolution{" "}
+              {EthereumMapper.formatDateRange(startDate, endDate)}
+            </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
