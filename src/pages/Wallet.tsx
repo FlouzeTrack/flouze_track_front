@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { WalletHeader } from "@/components/wallet/WalletHeader";
 import { FormattedBalance } from "@/types/ethereumBalancesData";
+import TransactionsList from "@/components/charts/TransactionsList";
 
 export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
 
@@ -65,7 +66,6 @@ const Wallet = () => {
     setSearchParams(params);
   };
 
-
   return (
     <div className="space-y-4">
       <WalletHeader
@@ -88,26 +88,37 @@ const Wallet = () => {
           });
         }}
       />
-
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col space-y-1.5">
-            <CardTitle>ETH Balance History</CardTitle>
-            <CardDescription>
-              <span className="font-bold">
-                Wallet {EthereumMapper.formatWalletAddress(walletId)}
-              </span>
-              <span>
-                {" "}
-                • {EthereumMapper.formatDateRange(startDate, endDate)}
-              </span>
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <WalletContent isLoading={isLoading} error={error} data={data} />
-        </CardContent>
-      </Card>
+      <div className="grid grid-flow-row-dense grid-cols-3 grid-rows-3 gap-4">
+        <div className="col-span-2">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col space-y-1.5">
+                <CardTitle>ETH Balance History</CardTitle>
+                <CardDescription>
+                  <span className="font-bold">
+                    Wallet {EthereumMapper.formatWalletAddress(walletId)}
+                  </span>
+                  <span>
+                    {" "}
+                    • {EthereumMapper.formatDateRange(startDate, endDate)}
+                  </span>
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <WalletContent isLoading={isLoading} error={error} data={data} />
+            </CardContent>
+          </Card>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Transactions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TransactionsList />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
