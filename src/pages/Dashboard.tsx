@@ -20,6 +20,7 @@ import { useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { FormattedCryptoPrice } from "@/types/cryptoPrice.types";
+import { useCryptoKpi } from "@/hooks/fetch/useCryptoKpi";
 
 const chartConfig = {
   close: {
@@ -71,7 +72,10 @@ export default function Dashboard() {
     endDate: format(endDate, "yyyy-MM-dd"),
   });
 
-  console.log("data : ", data);
+  const { kpiData, isKpiLoading, kpiError } = useCryptoKpi({
+    startDate: format(startDate, "yyyy-MM-dd"),
+    endDate: format(endDate, "yyyy-MM-dd"),
+  });
 
   const prices = data.map((d: FormattedCryptoPrice) => d.close);
   const minValue = Math.min(...prices);
@@ -105,12 +109,6 @@ export default function Dashboard() {
       maximumFractionDigits: 2,
     }).format(price);
 
-  const formatVolume = (volume: number) =>
-    new Intl.NumberFormat("en-US", {
-      notation: "compact",
-      maximumFractionDigits: 2,
-    }).format(volume);
-
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
     return date.toLocaleDateString("en-US", {
@@ -119,10 +117,10 @@ export default function Dashboard() {
     });
   };
 
-  const latestData = data[data.length - 1] || {};
-  const previousData = data[data.length - 2] || {};
-  const priceChange =
-    ((latestData.close - previousData.close) / previousData.close) * 100 || 0;
+  const highestPeriodPrice = kpiData?.highestPeriodPrice || 0;
+  const lowestPeriodPrice = kpiData?.lowestPeriodPrice || 0;
+  const currentPrice = kpiData?.currentPrice || 0;
+  const priceChange = kpiData?.priceChange || 0;
 
   return (
     <div className="space-y-6">
@@ -198,7 +196,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatPrice(latestData.close)}
+              {formatPrice(currentPrice)}
             </div>
             <div className="flex items-center gap-2 mt-2">
               {priceChange >= 0 ? (
@@ -219,35 +217,23 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">24h High</CardTitle>
+            <CardTitle className="text-sm font-medium">Period High</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-500">
-              {formatPrice(latestData.high)}
+              {formatPrice(highestPeriodPrice)}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">24h Low</CardTitle>
+            <CardTitle className="text-sm font-medium">Period Low</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-500">
-              {formatPrice(latestData.low)}
+              {formatPrice(lowestPeriodPrice)}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Volume</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatVolume(latestData.volumeto)}
-            </div>
-            <p className="text-xs text-muted-foreground">USD</p>
           </CardContent>
         </Card>
       </div>
