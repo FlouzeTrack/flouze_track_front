@@ -87,7 +87,7 @@ export function WalletStats({
   changePercent,
 }: WalletBalanceStatsProps) {
   return (
-    <CardFooter className="flex-col items-start gap-2 text-sm">
+    <CardFooter className="flex-col items-start gap-2 text-sm p-0">
       <div className="flex items-center gap-2 font-medium leading-none">
         {changePercent >= 0 ? (
           <>
