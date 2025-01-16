@@ -1,15 +1,5 @@
 import { TrendingUp, TrendingDown, BarChart } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Line,
-  LineChart,
-} from "recharts";
+import { CartesianGrid, XAxis, YAxis, Line, LineChart } from "recharts";
 import {
   Card,
   CardContent,
@@ -23,6 +13,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useCryptoPrice } from "@/hooks/fetch/useCryptoPrice";
+import { format, subMonths } from "date-fns";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { DateRange } from "react-day-picker";
+import { DateRangePicker } from "@/components/ui/DateRangePicker";
 
 const mockData = [
   {
@@ -33,15 +29,6 @@ const mockData = [
     volumefrom: 9919.49,
     volumeto: 972181437.3,
     close: 98213.69,
-  },
-  {
-    time: 1736035200,
-    high: 98818.4,
-    low: 97248.4,
-    open: 98213.69,
-    volumefrom: 9872.68,
-    volumeto: 967941540.09,
-    close: 98346.97,
   },
   {
     time: 1736121600,
@@ -79,87 +66,6 @@ const mockData = [
     volumeto: 4696698492.32,
     close: 92548.12,
   },
-  {
-    time: 1736467200,
-    high: 95845.36,
-    low: 92206.53,
-    open: 92548.12,
-    volumefrom: 55479.83,
-    volumeto: 5217667771.49,
-    close: 94710.29,
-  },
-  {
-    time: 1736553600,
-    high: 94985.54,
-    low: 93826.56,
-    open: 94710.29,
-    volumefrom: 9594.23,
-    volumeto: 905586720.06,
-    close: 94569.95,
-  },
-  {
-    time: 1736640000,
-    high: 95388.08,
-    low: 93675.7,
-    open: 94569.95,
-    volumefrom: 10865.93,
-    volumeto: 1027482279.92,
-    close: 94505.67,
-  },
-  {
-    time: 1736726400,
-    high: 95894.16,
-    low: 89153.4,
-    open: 94505.67,
-    volumefrom: 67978.59,
-    volumeto: 6274787648.38,
-    close: 94517.66,
-  },
-  {
-    time: 1736812800,
-    high: 97357.87,
-    low: 94324.09,
-    open: 94517.66,
-    volumefrom: 26094.12,
-    volumeto: 2505664957.66,
-    close: 96569.32,
-  },
-  {
-    time: 1736899200,
-    high: 98123.45,
-    low: 95678.9,
-    open: 96569.32,
-    volumefrom: 28456.78,
-    volumeto: 2756934567.89,
-    close: 97234.56,
-  },
-  {
-    time: 1736985600,
-    high: 99876.54,
-    low: 96789.12,
-    open: 97234.56,
-    volumefrom: 32145.67,
-    volumeto: 3145678901.23,
-    close: 98765.43,
-  },
-  {
-    time: 1737072000,
-    high: 101234.56,
-    low: 97890.12,
-    open: 98765.43,
-    volumefrom: 35678.9,
-    volumeto: 3567890123.45,
-    close: 100123.45,
-  },
-  {
-    time: 1737158400,
-    high: 102345.67,
-    low: 99012.34,
-    open: 100123.45,
-    volumefrom: 38901.23,
-    volumeto: 3890123456.78,
-    close: 101234.56,
-  },
 ];
 
 const chartConfig = {
@@ -170,6 +76,47 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function Dashboard() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Set default dates only if they're not in URL
+  useEffect(() => {
+    if (!searchParams.has("startDate") || !searchParams.has("endDate")) {
+      const endDate = new Date();
+      const startDate = subMonths(endDate, 6);
+
+      const params = new URLSearchParams(searchParams);
+      params.set("startDate", format(startDate, "yyyy-MM-dd"));
+      params.set("endDate", format(endDate, "yyyy-MM-dd"));
+      setSearchParams(params);
+    }
+  }, []);
+
+  const startDate = searchParams.get("startDate")
+    ? new Date(searchParams.get("startDate")!)
+    : subMonths(new Date(), 6);
+
+  const endDate = searchParams.get("endDate")
+    ? new Date(searchParams.get("endDate")!)
+    : new Date();
+
+  const initialDateRange: DateRange = {
+    from: startDate,
+    to: endDate,
+  };
+
+  const handleDateChange = (range: DateRange) => {
+    if (!range.from || !range.to) return;
+
+    const params = new URLSearchParams(searchParams);
+    params.set("startDate", format(range.from, "yyyy-MM-dd"));
+    params.set("endDate", format(range.to, "yyyy-MM-dd"));
+    setSearchParams(params);
+  };
+
+  const { data, isLoading, error } = useCryptoPrice();
+
+  console.log("data : ", data);
+
   const prices = mockData.map((d) => d.close);
   const minValue = Math.min(...prices);
   const maxValue = Math.max(...prices);
@@ -223,6 +170,12 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <div className="mb-4">
+        <DateRangePicker
+          initialDateRange={initialDateRange}
+          onDateChange={handleDateChange}
+        />
+      </div>
       <Card className="h-full">
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-between">
