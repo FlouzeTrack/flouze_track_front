@@ -4,6 +4,7 @@ import {
   BalanceHistoryResponse,
   FormattedBalance,
 } from "@/types/ethereumBalancesData";
+import ApiErrorResponse from "@/types/api";
 import { EthereumMapper } from "@/mappers/ethereumMapper";
 
 interface WalletBalanceParams {
@@ -47,7 +48,17 @@ export const useWalletBalance = (
       setError(null);
     } catch (err: any) {
       console.error("Failed to fetch data:", err);
-      setError(err.message || "Failed to fetch data");
+      const errorResponse = err.response?.data as ApiErrorResponse;
+
+      const errorMessage = errorResponse
+        ? `${errorResponse.error}${
+            errorResponse.errors
+              ? " - " + errorResponse.errors.map((e) => e.message).join(", ")
+              : ""
+          }`
+        : "Failed to fetch data";
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

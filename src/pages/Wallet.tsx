@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -7,66 +7,146 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { WalletStats } from "@/components/charts/WalletChart";
-import { WalletChart } from "@/components/charts/WalletChart";
+import { WalletStats, WalletChart } from "@/components/charts/WalletChart";
 import { useWalletBalance } from "@/hooks/fetch/useWalletBalance";
 import { EthereumMapper } from "@/mappers/ethereumMapper";
-import { DateRangePicker } from "@/components/ui/DateRangePicker";
+import { AlertCircle } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { format, subMonths } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { WalletHeader } from "@/components/wallet/WalletHeader";
+import { FormattedBalance } from "@/types/ethereumBalancesData";
 
-const WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
+export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
+
+const FAVORITE_WALLETS = [
+  { id: DEFAULT_WALLET_ID, name: "Main Wallet" },
+  {
+    id: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+    name: "Secondary Wallet",
+  },
+];
 
 const Wallet = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
 
-  // Set default dates only if they're not in URL
-  useEffect(() => {
-    if (!searchParams.has("startDate") || !searchParams.has("endDate")) {
-      const endDate = new Date();
-      const startDate = subMonths(endDate, 6);
-
-      const params = new URLSearchParams(searchParams);
-      params.set("startDate", format(startDate, "yyyy-MM-dd"));
-      params.set("endDate", format(endDate, "yyyy-MM-dd"));
-      setSearchParams(params);
-    }
-  }, []);
-
+  const walletId = searchParams.get("walletId") || DEFAULT_WALLET_ID;
   const startDate = searchParams.get("startDate")
     ? new Date(searchParams.get("startDate")!)
-    : subMonths(new Date(), 6);
-
+    : subMonths(new Date(), 1);
   const endDate = searchParams.get("endDate")
     ? new Date(searchParams.get("endDate")!)
     : new Date();
 
-  const initialDateRange: DateRange = {
-    from: startDate,
-    to: endDate,
-  };
+  const dateRange: DateRange = { from: startDate, to: endDate };
 
-  const { data, isLoading, error } = useWalletBalance(WALLET_ID, {
+  useEffect(() => {
+    if (!searchParams.has("startDate") || !searchParams.has("endDate")) {
+      const params = new URLSearchParams(searchParams);
+      params.set("startDate", format(startDate, "yyyy-MM-dd"));
+      params.set("endDate", format(endDate, "yyyy-MM-dd"));
+      params.set("walletId", DEFAULT_WALLET_ID);
+      setSearchParams(params);
+    }
+  }, []);
+
+  const { data, isLoading, error } = useWalletBalance(walletId, {
     startDate: format(startDate, "yyyy-MM-dd"),
     endDate: format(endDate, "yyyy-MM-dd"),
   });
 
-  const handleDateChange = (range: DateRange) => {
-    if (!range.from || !range.to) return;
-
+  const updateSearchParams = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams);
-    params.set("startDate", format(range.from, "yyyy-MM-dd"));
-    params.set("endDate", format(range.to, "yyyy-MM-dd"));
+    Object.entries(updates).forEach(([key, value]) => {
+      params.set(key, value);
+    });
     setSearchParams(params);
   };
 
-  // Refetch when dates change
-  // useEffect(() => {
-  //   refetch();
-  // }, [searchParams]);
 
-  if (error) return <div>Error: {error}</div>;
+  return (
+    <div className="space-y-4">
+      <WalletHeader
+        isSearchVisible={isSearchVisible}
+        walletId={walletId}
+        favoriteWallets={FAVORITE_WALLETS}
+        dateRange={dateRange}
+        onSearchSubmit={(newWalletId) =>
+          updateSearchParams({ walletId: newWalletId })
+        }
+        onSearchVisibilityChange={setIsSearchVisible}
+        onWalletSelect={(newWalletId) =>
+          updateSearchParams({ walletId: newWalletId })
+        }
+        onDateChange={(range) => {
+          if (!range.from || !range.to) return;
+          updateSearchParams({
+            startDate: format(range.from, "yyyy-MM-dd"),
+            endDate: format(range.to, "yyyy-MM-dd"),
+          });
+        }}
+      />
+
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col space-y-1.5">
+            <CardTitle>ETH Balance History</CardTitle>
+            <CardDescription>
+              <span className="font-bold">
+                Wallet {EthereumMapper.formatWalletAddress(walletId)}
+              </span>
+              <span>
+                {" "}
+                • {EthereumMapper.formatDateRange(startDate, endDate)}
+              </span>
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <WalletContent isLoading={isLoading} error={error} data={data} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const WalletContent = ({
+  isLoading,
+  error,
+  data,
+}: {
+  isLoading: boolean;
+  error: string | null;
+  data: FormattedBalance[];
+}) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-[300px] w-full mb-6" />
+        <div className="flex flex-col items-start gap-2">
+          <Skeleton className="h-4 w-[200px]" />
+          <Skeleton className="h-4 w-[250px]" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-[300px] flex items-center justify-center bg-destructive/5">
+        <Alert
+          variant="destructive"
+          className="w-[500px] border-destructive/50"
+        >
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription className="mt-2 text-sm">{error}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   const latestValue = data[data.length - 1]?.eth || 0;
   const previousValue = data[data.length - 2]?.eth || 0;
@@ -77,27 +157,10 @@ const Wallet = () => {
 
   return (
     <>
-      <div className="mb-4">
-        <DateRangePicker
-          initialDateRange={initialDateRange}
-          onDateChange={handleDateChange}
-        />
-      </div>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle>ETH Balance History</CardTitle>
-            <CardDescription>
-              Balance evolution{" "}
-              {EthereumMapper.formatDateRange(startDate, endDate)}
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? "loading..." : <WalletChart data={data} />}
-        </CardContent>
+      <WalletChart data={data} />
+      <div className="mt-4">
         <WalletStats latestValue={latestValue} changePercent={changePercent} />
-      </Card>
+      </div>
     </>
   );
 };
