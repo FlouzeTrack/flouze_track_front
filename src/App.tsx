@@ -43,26 +43,26 @@ const DashboardLayout = () => {
   const [defaultOpen] = useSidebarState();
 
   return (
-    // <ProtectedRoute>
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <div className="flex h-screen w-full overflow-hidden">
-        <div className="h-full shrink-0">
-          <AppSidebar />
+    <ProtectedRoute>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <div className="flex h-screen w-full overflow-hidden">
+          <div className="h-full shrink-0">
+            <AppSidebar />
+          </div>
+          <div
+            className={cn(
+              "flex flex-col flex-1 transition-all duration-300 ease-in-out",
+              defaultOpen ? "w-[calc(100%-16rem)]" : "w-[calc(100%-3rem)]"
+            )}
+          >
+            <Header />
+            <main className="flex-1 overflow-y-auto p-4">
+              <Outlet />
+            </main>
+          </div>
         </div>
-        <div
-          className={cn(
-            "flex flex-col flex-1 transition-all duration-300 ease-in-out",
-            defaultOpen ? "w-[calc(100%-16rem)]" : "w-[calc(100%-3rem)]"
-          )}
-        >
-          <Header />
-          <main className="flex-1 overflow-y-auto p-4">
-            <Outlet />
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
-    // </ProtectedRoute>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 };
 

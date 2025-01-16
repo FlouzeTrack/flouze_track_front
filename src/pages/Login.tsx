@@ -77,7 +77,7 @@ export default function SignIn() {
         toast({
           variant: "destructive",
           title: "Login failed",
-          description: error.response?.data?.message || "Invalid credentials",
+          description: error.response?.data?.error || "Invalid credentials",
         });
       } finally {
         setIsLoading(false);

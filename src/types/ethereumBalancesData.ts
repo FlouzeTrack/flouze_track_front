@@ -1,11 +1,14 @@
+export interface BalanceHistoryItem {
+  date: string;
+  value: string;
+}
+
 export interface BalanceHistoryResponse {
-  history: Array<{
-    timestamp: number;
-    value: string;
-  }>;
+  history: BalanceHistoryItem[];
 }
 
 export interface FormattedBalance {
+  date: string;
   timestamp: number;
   eth: number;
 }

@@ -23,9 +23,21 @@ const formSchema = z
     email: z.string().email({
       message: "Email must be a valid email address.",
     }),
-    password: z.string().min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
+    password: z
+      .string()
+      .min(8, {
+        message: "Password must be at least 8 characters.",
+      })
+      .max(32, {
+        message: "Password must be less than 32 characters.",
+      })
+      .regex(
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        {
+          message:
+            "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character (@$!%*?&)",
+        }
+      ),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -87,7 +99,7 @@ export default function SignUp() {
           variant: "destructive",
           title: "Registration failed",
           description:
-            error.response?.data?.message ||
+            error.response?.data?.error ||
             "An error occurred during registration",
         });
       } finally {
