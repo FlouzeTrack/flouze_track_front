@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import API from "../services/api";
-import { Card } from "@/components/ui/card";
-import { ArrowBigLeft, ArrowLeft, Bitcoin } from "lucide-react";
+import { ArrowLeft, Bitcoin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const ForgotPassword = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [email, setEmail] = useState<string>("");
   const [msg, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -28,6 +29,10 @@ const ForgotPassword = () => {
     } catch (error) {
       console.error("Failed to send reset password link:", error);
       setError(t("auth.errorSendFailed"));
+      toast({
+        title: t("auth.errorSendFailed"),
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -63,12 +68,6 @@ const ForgotPassword = () => {
                 <span>✅</span>
                 <span className="ml-2">{msg}</span>
               </div>
-            )}
-            {error && (
-              <Card className="text-red-500 bg-red-50 p-2 rounded-md flex items-center">
-                <span>❌</span>
-                <span className="ml-2">{error}</span>
-              </Card>
             )}
             <form
               onSubmit={handleSubmit}
