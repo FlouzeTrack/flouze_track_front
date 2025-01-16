@@ -48,13 +48,6 @@ const ForgotPassword = () => {
             </div>
             FlouzeTrack
           </a>
-          <NavLink
-            to="/login"
-            className="text-sm text-card-foreground mr-auto flex items-center gap-2"
-          >
-            <ArrowLeft />
-            Return to login
-          </NavLink>
         </div>
         <div className={`flex flex-1 items-center justify-center py-12`}>
           <div className="mx-auto grid w-[350px] gap-6">
