@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { Fragment } from "react";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { LanguageToggle } from "../ui/LanguageToggle";
+import { DateRangePicker } from "@/components/ui/DateRangePicker";
+import { useDateRange } from "@/providers/DateRangeProvider";
 
 export function Header() {
   const { t } = useTranslation();
@@ -23,6 +25,7 @@ export function Header() {
 
   const isRoot = pathname === "/";
   const homeItem = items.find((item) => item.url === "/");
+  const { dateRange, updateDateRange } = useDateRange();
 
   const getBreadcrumbTitleAndIcon = (segment: string, index: number) => {
     if (!isNaN(Number(segment))) {
@@ -125,6 +128,10 @@ export function Header() {
         </Breadcrumb>
 
         <div className="flex items-center gap-2">
+          <DateRangePicker
+            initialDateRange={dateRange}
+            onDateChange={updateDateRange}
+          />
           <ThemeToggle />
           <LanguageToggle />
         </div>

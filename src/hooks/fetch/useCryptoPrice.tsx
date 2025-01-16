@@ -1,4 +1,3 @@
-// src/hooks/fetch/useCryptoPrice.tsx
 import { useState, useEffect } from "react";
 import { API } from "@/services/api";
 import {
@@ -12,14 +11,19 @@ interface CryptoPriceParams {
   currency?: string;
 }
 
-export const useCryptoPrice = (params: CryptoPriceParams) => {
+interface CryptoPriceResult {
+  data: FormattedCryptoPrice[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+export const useCryptoPrice = (
+  params: CryptoPriceParams
+): CryptoPriceResult => {
   const [data, setData] = useState<FormattedCryptoPrice[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  if (!params) {
-    return null;
-  }
 
   const fetchData = async () => {
     try {

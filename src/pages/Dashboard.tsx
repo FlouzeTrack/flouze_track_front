@@ -14,13 +14,10 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useCryptoPrice } from "@/hooks/fetch/useCryptoPrice";
-import { format, subMonths } from "date-fns";
-import { useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
-import { DateRange } from "react-day-picker";
-import { DateRangePicker } from "@/components/ui/DateRangePicker";
+import { format } from "date-fns";
 import { FormattedCryptoPrice } from "@/types/cryptoPrice.types";
 import { useCryptoKpi } from "@/hooks/fetch/useCryptoKpi";
+import { useDateRange } from "@/providers/DateRangeProvider";
 
 const chartConfig = {
   close: {
@@ -30,51 +27,16 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function Dashboard() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Set default dates only if they're not in URL
-  useEffect(() => {
-    if (!searchParams.has("startDate") || !searchParams.has("endDate")) {
-      const endDate = new Date();
-      const startDate = subMonths(endDate, 6);
-
-      const params = new URLSearchParams(searchParams);
-      params.set("startDate", format(startDate, "yyyy-MM-dd"));
-      params.set("endDate", format(endDate, "yyyy-MM-dd"));
-      setSearchParams(params);
-    }
-  }, []);
-
-  const startDate = searchParams.get("startDate")
-    ? new Date(searchParams.get("startDate")!)
-    : subMonths(new Date(), 6);
-
-  const endDate = searchParams.get("endDate")
-    ? new Date(searchParams.get("endDate")!)
-    : new Date();
-
-  const initialDateRange: DateRange = {
-    from: startDate,
-    to: endDate,
-  };
-
-  const handleDateChange = (range: DateRange) => {
-    if (!range.from || !range.to) return;
-
-    const params = new URLSearchParams(searchParams);
-    params.set("startDate", format(range.from, "yyyy-MM-dd"));
-    params.set("endDate", format(range.to, "yyyy-MM-dd"));
-    setSearchParams(params);
-  };
+  const { dateRange } = useDateRange();
 
   const { data, isLoading, error } = useCryptoPrice({
-    startDate: format(startDate, "yyyy-MM-dd"),
-    endDate: format(endDate, "yyyy-MM-dd"),
+    startDate: format(dateRange.from!, "yyyy-MM-dd"),
+    endDate: format(dateRange.to!, "yyyy-MM-dd"),
   });
 
   const { kpiData, isKpiLoading, kpiError } = useCryptoKpi({
-    startDate: format(startDate, "yyyy-MM-dd"),
-    endDate: format(endDate, "yyyy-MM-dd"),
+    startDate: format(dateRange.from!, "yyyy-MM-dd"),
+    endDate: format(dateRange.to!, "yyyy-MM-dd"),
   });
 
   const prices = data.map((d: FormattedCryptoPrice) => d.close);
@@ -124,12 +86,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="mb-4">
-        <DateRangePicker
-          initialDateRange={initialDateRange}
-          onDateChange={handleDateChange}
-        />
-      </div>
       <Card className="h-full">
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-between">
