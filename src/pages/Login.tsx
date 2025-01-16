@@ -62,8 +62,9 @@ export default function SignIn() {
           password: values.password,
         });
 
-        if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
+        if (response.data.accessToken && response.data.refreshToken) {
+          localStorage.setItem("token", response.data.accessToken);
+          localStorage.setItem("refreshToken", response.data.refreshToken);
           login(); // Update auth context
 
           toast({
