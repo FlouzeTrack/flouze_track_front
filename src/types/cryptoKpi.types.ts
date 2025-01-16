@@ -12,3 +12,11 @@ export interface CryptoKpi {
   lowestPeriodPrice: number;
   lowestPeriodPriceTimestamp: number;
 }
+
+export interface CryptoKpiResult {
+  kpiData: CryptoKpi | undefined;
+  isKpiLoading: boolean;
+  kpiError: string | null;
+  refetch: () => Promise<void>;
+}
+

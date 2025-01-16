@@ -1,16 +1,11 @@
-// src/hooks/fetch/useCryptoKpi.tsx
 import { useState, useEffect } from "react";
 import { API } from "@/services/api";
-import { CryptoKpi, CryptoKpiParams } from "@/types/cryptoKpi.types";
+import { CryptoKpi, CryptoKpiParams, CryptoKpiResult } from "@/types/cryptoKpi.types";
 
-export const useCryptoKpi = (params: CryptoKpiParams) => {
+export const useCryptoKpi = (params: CryptoKpiParams): CryptoKpiResult => {
   const [kpiData, setKpiData] = useState<CryptoKpi>();
   const [isKpiLoading, setIsKpiLoading] = useState<boolean>(true);
   const [kpiError, setKpiError] = useState<string | null>(null);
-
-  if (!params) {
-    return null;
-  }
 
   const fetchData = async () => {
     try {

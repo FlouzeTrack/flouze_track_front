@@ -11,13 +11,13 @@ import { WalletStats, WalletChart } from "@/components/charts/WalletChart";
 import { useWalletBalance } from "@/hooks/fetch/useWalletBalance";
 import { EthereumMapper } from "@/mappers/ethereumMapper";
 import { AlertCircle } from "lucide-react";
-import { DateRange } from "react-day-picker";
-import { format, subMonths } from "date-fns";
+import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { WalletHeader } from "@/components/wallet/WalletHeader";
 import { FormattedBalance } from "@/types/ethereumBalancesData";
 import TransactionsList from "@/components/charts/TransactionsList";
+import { useDateRange } from "@/providers/DateRangeProvider";
 
 export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
 
@@ -32,30 +32,21 @@ const FAVORITE_WALLETS = [
 const Wallet = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const { dateRange } = useDateRange();
 
   const walletId = searchParams.get("walletId") || DEFAULT_WALLET_ID;
-  const startDate = searchParams.get("startDate")
-    ? new Date(searchParams.get("startDate")!)
-    : subMonths(new Date(), 1);
-  const endDate = searchParams.get("endDate")
-    ? new Date(searchParams.get("endDate")!)
-    : new Date();
-
-  const dateRange: DateRange = { from: startDate, to: endDate };
 
   useEffect(() => {
-    if (!searchParams.has("startDate") || !searchParams.has("endDate")) {
+    if (!searchParams.has("walletId")) {
       const params = new URLSearchParams(searchParams);
-      params.set("startDate", format(startDate, "yyyy-MM-dd"));
-      params.set("endDate", format(endDate, "yyyy-MM-dd"));
       params.set("walletId", DEFAULT_WALLET_ID);
       setSearchParams(params);
     }
   }, []);
 
   const { data, isLoading, error } = useWalletBalance(walletId, {
-    startDate: format(startDate, "yyyy-MM-dd"),
-    endDate: format(endDate, "yyyy-MM-dd"),
+    startDate: format(dateRange.from!, "yyyy-MM-dd"),
+    endDate: format(dateRange.to!, "yyyy-MM-dd"),
   });
 
   const updateSearchParams = (updates: Record<string, string>) => {
@@ -65,14 +56,12 @@ const Wallet = () => {
     });
     setSearchParams(params);
   };
-
   return (
     <div className="space-y-4">
       <WalletHeader
         isSearchVisible={isSearchVisible}
         walletId={walletId}
         favoriteWallets={FAVORITE_WALLETS}
-        dateRange={dateRange}
         onSearchSubmit={(newWalletId) =>
           updateSearchParams({ walletId: newWalletId })
         }
@@ -80,13 +69,6 @@ const Wallet = () => {
         onWalletSelect={(newWalletId) =>
           updateSearchParams({ walletId: newWalletId })
         }
-        onDateChange={(range) => {
-          if (!range.from || !range.to) return;
-          updateSearchParams({
-            startDate: format(range.from, "yyyy-MM-dd"),
-            endDate: format(range.to, "yyyy-MM-dd"),
-          });
-        }}
       />
       <div className="grid grid-flow-row-dense grid-cols-3 grid-rows-3 gap-4">
         <div className="col-span-2">
@@ -100,7 +82,10 @@ const Wallet = () => {
                   </span>
                   <span>
                     {" "}
-                    • {EthereumMapper.formatDateRange(startDate, endDate)}
+                    {EthereumMapper.formatDateRange(
+                      dateRange.from!,
+                      dateRange.to!
+                    )}
                   </span>
                 </CardDescription>
               </div>
@@ -119,6 +104,27 @@ const Wallet = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col space-y-1.5">
+            <CardTitle>ETH Balance History</CardTitle>
+            <CardDescription>
+              <span className="font-bold">
+                Wallet {EthereumMapper.formatWalletAddress(walletId)}
+              </span>
+              <span>
+                {" "}
+                •
+                {EthereumMapper.formatDateRange(dateRange.from!, dateRange.to!)}
+              </span>
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <WalletContent isLoading={isLoading} error={error} data={data} />
+        </CardContent>
+      </Card>
     </div>
   );
 };
