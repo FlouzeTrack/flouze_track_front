@@ -18,12 +18,13 @@ const VerifyEmail = () => {
         setMessage("Invalid verification link.");
         return;
       }
-
+    
       setLoading(true);
       try {
         const { data } = await API.post<VerifyEmailResponse>(
           "/auth/verify-email",
-          { token }
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         setMessage(data.message);
       } catch (error: any) {
@@ -34,6 +35,7 @@ const VerifyEmail = () => {
         setLoading(false);
       }
     };
+    
 
     verifyEmail();
   }, []);
