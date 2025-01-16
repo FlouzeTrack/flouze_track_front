@@ -14,8 +14,12 @@ const createAPI = (isAuthService = false) => {
 
   const TokenService = {
     getToken: () => localStorage.getItem("token"),
+    getRefreshToken: () => localStorage.getItem("refreshToken"),
     setToken: (token: string) => localStorage.setItem("token", token),
-    removeToken: () => localStorage.removeItem("token"),
+    removeToken: () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+    },
   };
 
   const onRefreshed = (token: string) => {
@@ -58,10 +62,20 @@ const createAPI = (isAuthService = false) => {
         isRefreshing = true;
 
         try {
+          const refreshToken = TokenService.getRefreshToken();
+          if (!refreshToken) {
+            throw new Error("No refresh token available");
+          }
+
           const { data } = await axios.post(
             `${instance.defaults.baseURL}/auth/refresh`,
             {},
-            { withCredentials: true }
+            {
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${refreshToken}`,
+              },
+            }
           );
 
           const { accessToken } = data;
