@@ -26,12 +26,32 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function WalletChart({ data }: WalletBalanceChartProps) {
+const WalletChartTooltip = ({ active, payload }: any) => {
+  if (!active || !payload?.length) return null;
+
+  const data = payload[0].payload;
   return (
-    <ChartContainer className="h-[50vh] w-full" config={chartConfig}>
+    <div className="rounded-lg border bg-background p-2 shadow-sm">
+      <div className="grid gap-2">
+        <div className="font-medium">
+          {EthereumMapper.formatEthValue(data.eth)}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {EthereumMapper.formatDateTime(data.date)}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export function WalletChart({ data }: WalletBalanceChartProps) {
+  const domain = EthereumMapper.calculateChartDomain(data);
+
+  return (
+    <ChartContainer className="h-[300px] w-full" config={chartConfig}>
       <LineChart
         data={data}
-        margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+        margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
         accessibilityLayer
       >
         <CartesianGrid vertical={false} />
@@ -47,17 +67,9 @@ export function WalletChart({ data }: WalletBalanceChartProps) {
           axisLine={false}
           tickMargin={8}
           tickFormatter={EthereumMapper.formatEthValue}
+          domain={[domain.min, domain.max]}
         />
-        <ChartTooltip
-          cursor={false}
-          content={
-            <ChartTooltipContent
-              formatter={(value) =>
-                EthereumMapper.formatEthValue(Number(value))
-              }
-            />
-          }
-        />
+        <ChartTooltip content={<WalletChartTooltip />} />
         <Line
           type="stepAfter"
           dataKey="eth"
