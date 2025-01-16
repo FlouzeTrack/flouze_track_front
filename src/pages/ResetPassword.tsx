@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../services/api";
+import { AuthAPI } from "../services/api";
 import { Bitcoin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,7 +90,7 @@ const ResetPassword = () => {
         throw new Error("No reset token found");
       }
 
-      await API.post("/auth/reset-password", { password, token });
+      await AuthAPI.post("/auth/reset-password", { password, token });
       navigate("/login");
     } catch (error: any) {
       setErrors(error.response?.data?.message || "Reset password failed.");
