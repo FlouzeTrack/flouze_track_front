@@ -100,7 +100,7 @@ export default function SignUp() {
           variant: "destructive",
           title: "Registration failed",
           description:
-            error.response?.data?.message ||
+            error.response?.data?.error ||
             "An error occurred during registration",
         });
       } finally {

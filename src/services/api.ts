@@ -43,13 +43,19 @@ const createAPI = (isAuthService = false) => {
   );
 
   instance.interceptors.response.use(
-    (response) => {
-      return response;
-    },
+    (response) => response,
     async (error) => {
       const originalRequest = error.config;
-      if (error.response.status === 401 && !originalRequest._retry) {
+
+      // Pass through auth route errors directly
+      if (originalRequest.url?.includes("/auth/signin")) {
+        return Promise.reject(error);
+      }
+
+      // Handle token refresh for non-auth routes
+      if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
+
         if (isRefreshing) {
           return new Promise((resolve) => {
             addRefreshSubscriber((token) => {
@@ -89,14 +95,12 @@ const createAPI = (isAuthService = false) => {
           isRefreshing = false;
 
           return instance(originalRequest);
-        } catch (err: any) {
-          console.error("Token refresh failed:", err.message);
-
+        } catch (err) {
+          console.error("Token refresh failed:", err);
           TokenService.removeToken();
           isRefreshing = false;
-
-          await new Promise((resolve) => setTimeout(resolve, 25000));
           window.location.href = "/login";
+          return Promise.reject(err);
         }
       }
 
