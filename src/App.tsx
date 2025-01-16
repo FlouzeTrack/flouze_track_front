@@ -79,16 +79,16 @@ const App = () => (
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email/:token" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
             </Route>
 
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/wallet" element={<Wallet />} />
               <Route path="/profile" element={<Profile />} />
-              <Route
-                path="/reset-password/:token"
-                element={<ResetPassword />}
-              />
             </Route>
 
             <Route path="*" element={<NotFound />} />
