@@ -1,16 +1,19 @@
 // src/hooks/fetch/useCryptoPrice.tsx
 import { useState, useEffect } from "react";
 import { API } from "@/services/api";
-import { CryptoPrice, CryptoPriceResponse } from "@/types/cryptoPrice.types";
+import {
+  CryptoPriceApiType,
+  FormattedCryptoPrice,
+} from "@/types/cryptoPrice.types";
 
 interface CryptoPriceParams {
-  currency: string;
-  startDate?: string;
-  endDate?: string;
+  startDate: string;
+  endDate: string;
+  currency?: string;
 }
 
-export const useCryptoPrice = (params?: CryptoPriceParams) => {
-  const [data, setData] = useState<CryptoPrice[]>([]);
+export const useCryptoPrice = (params: CryptoPriceParams) => {
+  const [data, setData] = useState<FormattedCryptoPrice[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,28 +21,31 @@ export const useCryptoPrice = (params?: CryptoPriceParams) => {
     return null;
   }
 
-  console.log("USECRYPTOPRICE");
-
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const urlParams = new URLSearchParams();
       urlParams.append("currency", params.currency || "ETH");
-      if (params?.startDate) urlParams.append("startDate", params.startDate);
-      if (params?.endDate) urlParams.append("endDate", params.endDate);
-      console.log("PARAMS", params);
+      urlParams.append("startDate", params.startDate);
+      urlParams.append("endDate", params.endDate);
 
-      const response = await API.get<CryptoPriceResponse>(
+      const response = await API.get<CryptoPriceApiType[]>(
         `/prices?${urlParams.toString()}`
       );
 
-      const formattedData: CryptoPrice[] = response.data.prices.map((item) => ({
-        time: item.timestamp,
-        high: item.high,
-        low: item.low,
-        open: item.open,
-        close: item.close,
-      }));
+      const formattedData: FormattedCryptoPrice[] = response.data.map(
+        (item) => ({
+          time: item.timestamp,
+          high: Math.floor(item.high * 100) / 100,
+          low: Math.floor(item.low * 100) / 100,
+          open: Math.floor(item.open * 100) / 100,
+          close: Math.floor(item.close * 100) / 100,
+          // high: item.high,
+          // low: item.low,
+          // open: item.open,
+          // close: item.close,
+        })
+      );
 
       setData(formattedData);
       setError(null);
@@ -52,10 +58,8 @@ export const useCryptoPrice = (params?: CryptoPriceParams) => {
   };
 
   useEffect(() => {
-    console.log("FETCHING DATA");
-
     fetchData();
-  }, []);
+  }, [params?.currency, params.startDate, params.endDate]);
 
   return { data, isLoading, error, refetch: fetchData };
 };

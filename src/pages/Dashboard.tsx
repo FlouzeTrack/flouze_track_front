@@ -15,58 +15,11 @@ import {
 } from "@/components/ui/chart";
 import { useCryptoPrice } from "@/hooks/fetch/useCryptoPrice";
 import { format, subMonths } from "date-fns";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
-
-const mockData = [
-  {
-    time: 1735948800,
-    high: 98757.16,
-    low: 97522.47,
-    open: 98135.8,
-    volumefrom: 9919.49,
-    volumeto: 972181437.3,
-    close: 98213.69,
-  },
-  {
-    time: 1736121600,
-    high: 102530.34,
-    low: 97908.09,
-    open: 98346.97,
-    volumefrom: 46146.96,
-    volumeto: 4654078182.67,
-    close: 102282.2,
-  },
-  {
-    time: 1736208000,
-    high: 102747.54,
-    low: 96112.95,
-    open: 102282.2,
-    volumefrom: 54319.14,
-    volumeto: 5348079997.25,
-    close: 96942.47,
-  },
-  {
-    time: 1736294400,
-    high: 97251.53,
-    low: 92488.45,
-    open: 96942.47,
-    volumefrom: 57721.92,
-    volumeto: 5480363249.42,
-    close: 95051.06,
-  },
-  {
-    time: 1736380800,
-    high: 95345.44,
-    low: 91197.56,
-    open: 95051.06,
-    volumefrom: 50519.28,
-    volumeto: 4696698492.32,
-    close: 92548.12,
-  },
-];
+import { FormattedCryptoPrice } from "@/types/cryptoPrice.types";
 
 const chartConfig = {
   close: {
@@ -113,11 +66,14 @@ export default function Dashboard() {
     setSearchParams(params);
   };
 
-  const { data, isLoading, error } = useCryptoPrice();
+  const { data, isLoading, error } = useCryptoPrice({
+    startDate: format(startDate, "yyyy-MM-dd"),
+    endDate: format(endDate, "yyyy-MM-dd"),
+  });
 
   console.log("data : ", data);
 
-  const prices = mockData.map((d) => d.close);
+  const prices = data.map((d: FormattedCryptoPrice) => d.close);
   const minValue = Math.min(...prices);
   const maxValue = Math.max(...prices);
   const buffer = (maxValue - minValue) * 0.05;
@@ -130,7 +86,7 @@ export default function Dashboard() {
   };
 
   // Add distributed dates helper
-  const getDistributedDates = (data: typeof mockData) => {
+  const getDistributedDates = (data: FormattedCryptoPrice[]) => {
     if (!data || data.length < 2) return [];
     const interval = Math.max(1, Math.floor(data.length / 7));
     return data
@@ -163,10 +119,10 @@ export default function Dashboard() {
     });
   };
 
-  const latestData = mockData[mockData.length - 1];
-  const previousData = mockData[mockData.length - 2];
+  const latestData = data[data.length - 1] || {};
+  const previousData = data[data.length - 2] || {};
   const priceChange =
-    ((latestData.close - previousData.close) / previousData.close) * 100;
+    ((latestData.close - previousData.close) / previousData.close) * 100 || 0;
 
   return (
     <div className="space-y-6">
@@ -181,10 +137,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <CardTitle>Price Evolution</CardTitle>
             <div className="text-sm font-medium text-muted-foreground">
-              {mockData.length} days period
+              {data.length} days period
             </div>
           </div>
-          <CardDescription>BTC price over time</CardDescription>
+          <CardDescription>ETH price over time</CardDescription>
         </CardHeader>
         <CardContent>
           <ChartContainer
@@ -192,7 +148,7 @@ export default function Dashboard() {
             className="h-[40vh] min-h-[300px] w-full"
           >
             <LineChart
-              data={mockData}
+              data={data}
               margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
               accessibilityLayer
             >
@@ -219,7 +175,7 @@ export default function Dashboard() {
                 tickLine={false}
                 axisLine={false}
                 interval="preserveStartEnd"
-                ticks={getDistributedDates(mockData)}
+                ticks={getDistributedDates(data)}
                 tick={{ fill: "hsl(var(--muted-foreground))" }}
               />
               <ChartTooltip content={<ChartTooltipContent />} />

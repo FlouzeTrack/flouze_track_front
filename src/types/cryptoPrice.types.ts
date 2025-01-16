@@ -1,7 +1,3 @@
-export interface CryptoPriceResponse {
-  prices: CryptoPriceApiType[];
-}
-
 export interface CryptoPriceApiType {
   created_at: Date;
   updated_at: Date;
@@ -12,7 +8,7 @@ export interface CryptoPriceApiType {
   close: number;
 }
 
-export interface CryptoPrice {
+export interface FormattedCryptoPrice {
   time: number;
   high: number;
   low: number;
