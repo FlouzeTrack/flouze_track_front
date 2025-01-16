@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import API from "../services/api";
+import { AuthAPI } from "../services/api";
 import { Bitcoin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ const ForgotPassword = () => {
     }
     setIsLoading(true);
     try {
-      const { data } = await API.post("/auth/forgot-password", { email });
+      const { data } = await AuthAPI.post("/auth/forgot-password", { email });
       setMessage(data.message);
       toast({
         title: msg,

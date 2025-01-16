@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "../services/api";
+import { AuthAPI } from "../services/api";
 import { NavLink } from "react-router-dom";
 import { ArrowLeft, Bitcoin } from "lucide-react";
 
@@ -18,12 +18,11 @@ const VerifyEmail = () => {
         setMessage("Invalid verification link.");
         return;
       }
-
+      localStorage.setItem("token", token);
       setLoading(true);
       try {
-        const { data } = await API.post<VerifyEmailResponse>(
-          "/auth/verify-email",
-          { token }
+        const { data } = await AuthAPI.post<VerifyEmailResponse>(
+          "/auth/verify-email"
         );
         setMessage(data.message);
       } catch (error: any) {
