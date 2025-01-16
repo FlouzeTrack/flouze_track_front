@@ -1,46 +1,74 @@
-# Getting Started with Create React App
+# FlouzeTrack - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React cryptocurrency tracking application built with Vite, connecting to Adonis.js microservices.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+- Node.js >= 16.0.0
+- npm >= 8.0.0
+- Modern web browser (Chrome, Firefox, Safari)
 
-### `npm start`
+## Setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Clone the repository:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+git clone https://github.com/yourusername/flouzetrack-frontend.git
+cd flouzetrack-frontend
+```
 
-### `npm test`
+2. Install dependencies:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install
+```
 
-### `npm run build`
+3. Configure environment:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```env
+VITE_API_AUTH_URL=http://localhost:4010/api/v1
+VITE_API_BASE_URL=http://localhost:5010/api/v1
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Start development server:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm run dev
+```
 
-### `npm run eject`
+## API Integration
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Example API calls using curl:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+# Get wallet balance
+curl -X GET "http://localhost:3000/api/v1/wallet/wallet_id/balances/?startDate=2023-10-23&endDate=2025-01-14" \
+  -H "Authorization: Bearer YOUR_TOKEN"
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+# Get transactions
+curl -X GET "http://localhost:3000/api/v1/wallet_id" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Using Postman:
 
-## Learn More
+1. Import the Postman collection from `docs/postman/flouzetrack-api.json`
+2. Set up environment variables for `API_URL` and `AUTH_TOKEN`
+3. Use the pre-configured requests
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Features
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- 🔐 Authentication system
+- 💰 Cryptocurrency wallet tracking
+- 📊 Real-time price charts
+- 🌍 Internationalization (EN/FR)
+- 🌓 Light/Dark theme
+- 📱 Responsive design
+
+## Tech Stack
+
+- React + TypeScript
+- Vite
+- Shadcn UI
+- i18next
+- React Query
