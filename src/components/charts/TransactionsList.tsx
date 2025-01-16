@@ -6,26 +6,11 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { ArrowRight, ArrowLeft, AlertCircle } from "lucide-react";
 import { DEFAULT_WALLET_ID } from "@/pages/Wallet";
 import { useTransactionsList } from "@/hooks/fetch/useTransactionsList";
-
-export interface Transaction {
-  hash: string;
-  symbol: string;
-  value: string;
-  date: string;
-  from: string;
-  to: string;
-  gasUsed: string;
-  gasPrice: string;
-}
-
-interface FormatAddressProps {
-  address: string;
-}
-
-interface CalculateFeesProps {
-  gasUsed: string;
-  gasPrice: string;
-}
+import {
+  CalculateFeesProps,
+  FormatAddressProps,
+  Transaction,
+} from "@/types/transactionsData";
 
 function TransactionsList() {
   const { transactions, isLoading, error } =

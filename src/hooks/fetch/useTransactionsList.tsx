@@ -1,5 +1,5 @@
-import { Transaction } from "@/components/charts/TransactionsList";
 import API from "@/services/api";
+import { Transaction } from "@/types/transactionsData";
 import { useEffect, useState } from "react";
 
 interface TransactionsListResult {
