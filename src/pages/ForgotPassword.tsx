@@ -24,10 +24,7 @@ const ForgotPassword = () => {
     try {
       const { data } = await AuthAPI.post("/auth/forgot-password", { email });
       setMessage(data.message);
-      toast({
-        title: msg,
-        variant: "default",
-      });
+      toast && toast({ title: "Success", description: data.message });
       setError("");
     } catch (error) {
       setError(t("auth.errorSendFailed"));

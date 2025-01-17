@@ -60,14 +60,14 @@ export default function Home() {
         <HomeTextImage
           title={t("home.textImage.0.title")}
           content={t("home.textImage.0.description")}
-          imgSrc="/images/undraw_wallet_aym5.svg"
+          imgSrc="home_screen_1.png"
           imgAlt={t("common.wallet")}
           revert={false}
         />
         <HomeTextImage
           title={t("home.textImage.1.title")}
           content={t("home.textImage.1.description")}
-          imgSrc="/images/undraw_wallet_aym5.svg"
+          imgSrc="home_screen_2.png"
           imgAlt={t("common.wallet")}
           ctaHref="/features"
           ctaTitle={t("home.textImage.1.cta")}

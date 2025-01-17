@@ -7,6 +7,7 @@ import { WalletHeader } from "@/components/wallet/WalletHeader";
 import { useDateRange } from "@/providers/DateRangeProvider";
 import { WalletPriceSection } from "@/components/wallet/WalletPriceSection";
 import { WalletBalanceSection } from "@/components/wallet/WalletBalanceSection";
+import TransactionsList from "@/components/charts/TransactionsList";
 
 export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
 
@@ -75,16 +76,27 @@ const Wallet = () => {
         error={walletPriceError}
       />
 
-      <WalletBalanceSection
-        data={balanceData}
-        isLoading={isBalanceLoading}
-        error={balanceError}
-        walletId={walletId}
-        dateRange={{
-          from: dateRange.from!,
-          to: dateRange.to!,
-        }}
-      />
+      <div className="grid grid-cols-3 gap-4">
+        <div className="col-span-3 h-full">
+          <WalletBalanceSection
+            data={balanceData}
+            isLoading={isBalanceLoading}
+            error={balanceError}
+            walletId={walletId}
+            dateRange={{
+              from: dateRange.from!,
+              to: dateRange.to!,
+            }}
+          />
+        </div>
+
+        {/* <div className="col-span-1 h-full">
+          <TransactionsList
+            walletId={walletId}
+            dateRange={{ startDate: dateRange.from!, endDate: dateRange.to! }}
+          />
+        </div> */}
+      </div>
     </div>
   );
 };
