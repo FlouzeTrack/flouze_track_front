@@ -1,5 +1,7 @@
+import { Button } from "../ui/button";
 import { WalletSearch } from "./WalletSearch";
 import { WalletSelector } from "./WalletSelector";
+import { ChevronRight } from "lucide-react";
 
 interface WalletHeaderProps {
   isSearchVisible: boolean;
@@ -8,6 +10,7 @@ interface WalletHeaderProps {
   onSearchSubmit: (walletId: string) => void;
   onSearchVisibilityChange: (visible: boolean) => void;
   onWalletSelect: (walletId: string) => void;
+  onWalletFavoriteClick: (walletId: string) => void;
 }
 
 export function WalletHeader({
@@ -17,6 +20,7 @@ export function WalletHeader({
   onSearchSubmit,
   onSearchVisibilityChange,
   onWalletSelect,
+  onWalletFavoriteClick,
 }: WalletHeaderProps) {
   return (
     <div className="flex items-center gap-4">
@@ -34,6 +38,13 @@ export function WalletHeader({
           onSearchClick={() => onSearchVisibilityChange(true)}
         />
       )}
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => onWalletFavoriteClick(walletId)}
+      >
+        <ChevronRight />
+      </Button>
     </div>
   );
 }

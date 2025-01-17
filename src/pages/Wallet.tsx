@@ -36,6 +36,15 @@ const Wallet = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const { dateRange } = useDateRange();
 
+  const {
+    data: walletsFavoriteData,
+    isLoading,
+    error,
+  } = useCryptoPrice({
+    startDate: format(dateRange.from!, "yyyy-MM-dd"),
+    endDate: format(dateRange.to!, "yyyy-MM-dd"),
+  });
+
   const walletId = searchParams.get("walletId") || DEFAULT_WALLET_ID;
 
   useEffect(() => {
@@ -83,6 +92,11 @@ const Wallet = () => {
     });
     setSearchParams(params);
   };
+
+  const updateFavorite = (updates: Record<string, string>) => {
+    console.log("updateFavorite", updates);
+  };
+
   return (
     <div className="space-y-4">
       <WalletHeader
@@ -95,6 +109,9 @@ const Wallet = () => {
         onSearchVisibilityChange={setIsSearchVisible}
         onWalletSelect={(newWalletId) =>
           updateSearchParams({ walletId: newWalletId })
+        }
+        onWalletFavoriteClick={(newWalletId) =>
+          updateFavorite({ address: newWalletId })
         }
       />
 
