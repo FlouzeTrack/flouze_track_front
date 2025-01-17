@@ -1,5 +1,10 @@
 import axios from "axios";
 
+interface ImportMetaEnv {
+  VITE_API_AUTH_URL: string;
+  VITE_API_BASE_URL: string;
+}
+
 const createAPI = (isAuthService = false) => {
   const instance = axios.create({
     baseURL:
@@ -47,12 +52,10 @@ const createAPI = (isAuthService = false) => {
     async (error) => {
       const originalRequest = error.config;
 
-      // Pass through auth route errors directly
       if (originalRequest.url?.includes("/auth/signin")) {
         return Promise.reject(error);
       }
 
-      // Handle token refresh for non-auth routes
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
 
@@ -73,8 +76,10 @@ const createAPI = (isAuthService = false) => {
             throw new Error("No refresh token available");
           }
 
+          const authUrl =
+          (import.meta as any).env.VITE_API_AUTH_URL || "http://localhost:4010/api/v1";
           const { data } = await axios.post(
-            `${instance.defaults.baseURL}/auth/refresh`,
+            `${authUrl}/auth/refresh`,
             {},
             {
               withCredentials: true,
@@ -99,7 +104,6 @@ const createAPI = (isAuthService = false) => {
           console.error("Token refresh failed:", err);
           TokenService.removeToken();
           isRefreshing = false;
-          // window.location.href = "/login";
           return Promise.reject(err);
         }
       }
