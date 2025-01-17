@@ -88,7 +88,8 @@ export default function SignUp() {
 
         toast({
           title: "Sign up successful",
-          description: "Your account has been created successfully!",
+          description:
+            "Your account has been created successfully! An email has been sent to you to verify your account.",
         });
 
         // Redirect to dashboard or login page
