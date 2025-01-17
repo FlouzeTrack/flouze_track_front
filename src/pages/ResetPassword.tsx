@@ -91,6 +91,10 @@ const ResetPassword = () => {
       }
 
       await AuthAPI.post("/auth/reset-password", { password, token });
+      toast({
+        title: "Password reset successful",
+        description: "You can now login with your new password.",
+      });
       navigate("/login");
     } catch (error: any) {
       setErrors(error.response?.data?.message || "Reset password failed.");
