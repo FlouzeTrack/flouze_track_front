@@ -69,7 +69,7 @@ export default function Home() {
           content={t("home.textImage.1.description")}
           imgSrc="home_screen_2.png"
           imgAlt={t("common.wallet")}
-          ctaHref="/features"
+          ctaHref="/login"
           ctaTitle={t("home.textImage.1.cta")}
           revert={true}
         />
