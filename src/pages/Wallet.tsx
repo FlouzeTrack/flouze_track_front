@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useWalletBalance } from "@/hooks/fetch/useWalletBalance";
 import { useWalletPrice } from "@/hooks/fetch/useWalletPrice";
@@ -7,22 +7,48 @@ import { WalletHeader } from "@/components/wallet/WalletHeader";
 import { useDateRange } from "@/providers/DateRangeProvider";
 import { WalletPriceSection } from "@/components/wallet/WalletPriceSection";
 import { WalletBalanceSection } from "@/components/wallet/WalletBalanceSection";
+import API from "@/services/api";
 
-export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
+// export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
 
-const FAVORITE_WALLETS = [
-  { id: DEFAULT_WALLET_ID, name: "Main Wallet" },
-  {
-    id: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    name: "Secondary Wallet",
-  },
-];
+// const FAVORITE_WALLETS = [
+//   { id: DEFAULT_WALLET_ID, name: "Main Wallet" },
+//   {
+//     id: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+//     name: "Secondary Wallet",
+//   },
+// ];
 
 const Wallet = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [favorites, setFavorites] = useState<FavoriteWallet[]>([]);
+  const [isFavoritesLoading, setIsFavoritesLoading] = useState(true);
   const { dateRange } = useDateRange();
-  const walletId = searchParams.get("walletId") || DEFAULT_WALLET_ID;
+
+  const fetchFavorites = async () => {
+    try {
+      const response = await API.get<FavoriteWallet[]>("/favorites");
+      setFavorites(response.data);
+    } catch (error) {
+      console.error("Failed to fetch favorites:", error);
+    } finally {
+      setIsFavoritesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
+
+  const defaultWalletId = favorites[0]?.walletAddress || "0x0";
+  const walletId = searchParams.get("walletId") || defaultWalletId;
+
+  const favoriteWallets = favorites.map((favorite) => ({
+    id: favorite.id,
+    walletAddress: favorite.walletAddress,
+    name: favorite.label,
+  }));
 
   // Helper function to update search params
   const updateSearchParams = (updates: Record<string, string>) => {
@@ -39,10 +65,16 @@ const Wallet = () => {
     isLoading: walletPriceIsLoading,
     error: walletPriceError,
     isSuccess: isWalletPriceSuccess,
-  } = useWalletPrice(walletId, {
-    startDate: format(dateRange.from!, "yyyy-MM-dd"),
-    endDate: format(dateRange.to!, "yyyy-MM-dd"),
-  });
+  } = useWalletPrice(
+    walletId,
+    {
+      startDate: format(dateRange.from!, "yyyy-MM-dd"),
+      endDate: format(dateRange.to!, "yyyy-MM-dd"),
+    },
+    {
+      enabled: !isFavoritesLoading && Boolean(walletId),
+    }
+  );
 
   // Second API call - Wallet balance (waits for price to load + 1s)
   const {
@@ -63,10 +95,11 @@ const Wallet = () => {
       <WalletHeader
         isSearchVisible={isSearchVisible}
         walletId={walletId}
-        favoriteWallets={FAVORITE_WALLETS}
+        favoriteWallets={favoriteWallets}
         onSearchSubmit={(id) => updateSearchParams({ walletId: id })}
         onSearchVisibilityChange={setIsSearchVisible}
-        onWalletSelect={(id) => updateSearchParams({ walletId: id })}
+        onWalletSelect={(address) => updateSearchParams({ walletId: address })}
+        onFavoritesChange={fetchFavorites}
       />
 
       <WalletPriceSection
