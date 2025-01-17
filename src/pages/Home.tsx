@@ -76,7 +76,7 @@ export default function Home() {
         <HomeTextImage
           title={t("home.textImage.2.title")}
           content={t("home.textImage.2.description")}
-          imgSrc="/images/undraw_wallet_aym5.svg"
+          imgSrc="home_screen_3.png"
           imgAlt={t("common.wallet")}
           revert={false}
         />
