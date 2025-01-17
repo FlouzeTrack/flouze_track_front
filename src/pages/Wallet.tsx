@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { WalletStats, WalletChart } from "@/components/charts/WalletChart";
 import { useWalletBalance } from "@/hooks/fetch/useWalletBalance";
+import { useWalletPrice } from "@/hooks/fetch/useWalletPrice";
 import { EthereumMapper } from "@/mappers/ethereumMapper";
 import { AlertCircle } from "lucide-react";
 import { format } from "date-fns";
@@ -18,6 +19,7 @@ import { WalletHeader } from "@/components/wallet/WalletHeader";
 import { FormattedBalance } from "@/types/ethereumBalancesData";
 import TransactionsList from "@/components/charts/TransactionsList";
 import { useDateRange } from "@/providers/DateRangeProvider";
+import { WalletPriceChart } from "@/components/charts/WalletPriceChart";
 
 export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
 
@@ -44,10 +46,35 @@ const Wallet = () => {
     }
   }, []);
 
-  const { data, isLoading, error } = useWalletBalance(walletId, {
-    startDate: format(dateRange.from!, "yyyy-MM-dd"),
-    endDate: format(dateRange.to!, "yyyy-MM-dd"),
-  });
+  const {
+    data: walletPriceData,
+    isLoading: walletPriceIsLoading,
+    error: walletPriceError,
+    // isSuccess: isWalletPriceSuccess,
+  } = useWalletPrice(
+    walletId,
+    {
+      startDate: format(dateRange.from!, "yyyy-MM-dd"),
+      endDate: format(dateRange.to!, "yyyy-MM-dd"),
+    }
+    // {
+    //   enabled: true,
+    // }
+  );
+
+  const {
+    data: balanceData,
+    isLoading: isBalanceLoading,
+    error: balanceError,
+    // isSuccess: isBalanceSuccess,
+  } = useWalletBalance(
+    walletId,
+    {
+      startDate: format(dateRange.from!, "yyyy-MM-dd"),
+      endDate: format(dateRange.to!, "yyyy-MM-dd"),
+    }
+    // { enabled: isWalletPriceSuccess }
+  );
 
   const updateSearchParams = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams);
@@ -70,7 +97,34 @@ const Wallet = () => {
           updateSearchParams({ walletId: newWalletId })
         }
       />
-      <div className="grid grid-flow-row-dense grid-cols-3 grid-rows-3 gap-4">
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Wallet Value vs ETH Price</CardTitle>
+          <CardDescription>
+            Compare your wallet value with ETH price over time
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {walletPriceIsLoading || walletPriceData === null ? (
+            <Skeleton className="h-[300px] w-full" />
+          ) : walletPriceError ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{walletPriceError}</AlertDescription>
+            </Alert>
+          ) : walletPriceData ? (
+            (console.log(
+              "walletPriceData",
+              walletPriceData,
+              walletPriceData.history
+            ),
+            (<WalletPriceChart data={walletPriceData.history} />))
+          ) : null}
+        </CardContent>
+      </Card>
+      {/* <div className="grid grid-flow-row-dense grid-cols-3 grid-rows-3 gap-4">
         <div className="col-span-2">
           <Card>
             <CardHeader>
@@ -103,7 +157,7 @@ const Wallet = () => {
             <TransactionsList />
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       <Card>
         <CardHeader>
@@ -122,7 +176,11 @@ const Wallet = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <WalletContent isLoading={isLoading} error={error} data={data} />
+          <WalletContent
+            isLoading={isBalanceLoading}
+            error={balanceError}
+            data={balanceData}
+          />
         </CardContent>
       </Card>
     </div>
