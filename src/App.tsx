@@ -44,6 +44,7 @@ const DashboardLayout = () => {
   const [defaultOpen] = useSidebarState();
 
   return (
+    <ProtectedRoute>
       <DateRangeProvider>
         <SidebarProvider defaultOpen={defaultOpen}>
           <div className="flex h-screen w-full overflow-hidden">
@@ -64,6 +65,7 @@ const DashboardLayout = () => {
           </div>
         </SidebarProvider>
       </DateRangeProvider>
+    </ProtectedRoute>
   );
 };
 

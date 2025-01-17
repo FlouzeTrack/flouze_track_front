@@ -13,6 +13,8 @@ interface WalletBalanceParams {
 
 interface WalletBalanceOptions {
   enabled?: boolean;
+  delay?: number;
+  previousRequestFailed?: boolean;
 }
 
 interface WalletBalanceResult {
@@ -29,13 +31,17 @@ export const useWalletBalance = (
   options: WalletBalanceOptions = {}
 ): WalletBalanceResult => {
   const [data, setData] = useState<FormattedBalance[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      setIsSuccess(false);
+
+      if (options.delay) {
+        await new Promise((resolve) => setTimeout(resolve, options.delay));
+      }
 
       const urlParams = new URLSearchParams();
       urlParams.append("startDate", params.startDate);
@@ -55,7 +61,6 @@ export const useWalletBalance = (
       setError(null);
       setIsSuccess(true);
     } catch (err: any) {
-      console.error("Failed to fetch data:", err);
       setError(err.message || "Failed to fetch data");
       setIsSuccess(false);
     } finally {
@@ -63,13 +68,22 @@ export const useWalletBalance = (
     }
   };
 
+  // Reset states when dependencies change
   useEffect(() => {
-    if (options.enabled === false) {
-      setIsLoading(false);
+    setData([]);
+    setError(null);
+    setIsSuccess(false);
+    setIsLoading(false);
+  }, [walletId, params.startDate, params.endDate]);
+
+  // Handle the actual data fetching
+  useEffect(() => {
+    if (!options.enabled) {
       return;
     }
+
     fetchData();
-  }, [walletId, params.startDate, params.endDate, options.enabled]);
+  }, [options.enabled]);
 
   return { data, isLoading, error, isSuccess, refetch: fetchData };
 };

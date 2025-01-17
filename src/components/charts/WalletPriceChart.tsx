@@ -1,18 +1,14 @@
-import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { Card, CardContent } from "@/components/ui/card";
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { BalanceHistoryWithPriceItem } from "@/types/ethereumWalletPricesData";
 
 interface WalletPriceChartProps {
-  data?: {
-    date: string;
-    price: string;
-    valueUsd: string;
-  }[];
+  data: BalanceHistoryWithPriceItem[]; // Update this line
 }
 
 const chartConfig = {
@@ -29,12 +25,6 @@ const chartConfig = {
 export function WalletPriceChart({ data = [] }: WalletPriceChartProps) {
   if (!data.length) return null;
 
-  const formattedData = data.map((item) => ({
-    time: new Date(item.date).getTime() / 1000,
-    price: parseFloat(item.price),
-    value: parseFloat(item.valueUsd),
-  }));
-
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
     return date.toLocaleDateString("en-US", {
@@ -50,11 +40,30 @@ export function WalletPriceChart({ data = [] }: WalletPriceChartProps) {
       minimumFractionDigits: 2,
     }).format(value);
 
+  const formattedData = data.map((item) => ({
+    time: new Date(item.date).getTime() / 1000,
+    price: parseFloat(item.price),
+    value: parseFloat(item.valueUsd),
+  }));
+
+  // Calculer les domaines pour chaque axe Y
+  const prices = formattedData.map((d) => d.price);
+  const values = formattedData.map((d) => d.value);
+
+  const priceMin = Math.min(...prices);
+  const priceMax = Math.max(...prices);
+  const valueMin = Math.min(...values);
+  const valueMax = Math.max(...values);
+
+  // Ajouter un buffer pour l'affichage
+  const priceBuffer = (priceMax - priceMin) * 0.1;
+  const valueBuffer = (valueMax - valueMin) * 0.1;
+
   return (
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
       <LineChart
         data={formattedData}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 5, right: 50, left: 50, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
         <XAxis
@@ -63,9 +72,36 @@ export function WalletPriceChart({ data = [] }: WalletPriceChartProps) {
           tickLine={false}
           axisLine={false}
         />
-        <YAxis tickFormatter={formatValue} tickLine={false} axisLine={false} />
+        {/* Axe Y pour le prix ETH */}
+        <YAxis
+          yAxisId="price"
+          orientation="left"
+          tickFormatter={formatValue}
+          domain={[priceMin - priceBuffer, priceMax + priceBuffer]}
+          tickLine={false}
+          axisLine={false}
+          stroke="hsl(var(--chart-1))"
+        />
+        {/* Axe Y pour la valeur du wallet */}
+        <YAxis
+          yAxisId="value"
+          orientation="right"
+          tickFormatter={formatValue}
+          domain={[valueMin - valueBuffer, valueMax + valueBuffer]}
+          tickLine={false}
+          axisLine={false}
+          stroke="hsl(var(--chart-2))"
+        />
+        <Legend
+          verticalAlign="top"
+          height={36}
+          formatter={(value) => {
+            return value === "price" ? "ETH Price" : "Wallet Value";
+          }}
+        />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Line
+          yAxisId="price"
           type="monotone"
           dataKey="price"
           stroke="hsl(var(--chart-1))"
@@ -73,6 +109,7 @@ export function WalletPriceChart({ data = [] }: WalletPriceChartProps) {
           dot={false}
         />
         <Line
+          yAxisId="value"
           type="monotone"
           dataKey="value"
           stroke="hsl(var(--chart-2))"
