@@ -1,4 +1,12 @@
-import { TrendingUp, TrendingDown, BarChart } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart,
+  MoveUpRight,
+  CalendarMinus,
+  CalendarPlus,
+  MoveDownRight,
+} from "lucide-react";
 import { CartesianGrid, XAxis, YAxis, Line, LineChart } from "recharts";
 import {
   Card,
@@ -18,6 +26,7 @@ import { format } from "date-fns";
 import { FormattedCryptoPrice } from "@/types/cryptoPrice.types";
 import { useCryptoKpi } from "@/hooks/fetch/useCryptoKpi";
 import { useDateRange } from "@/providers/DateRangeProvider";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const chartConfig = {
   close: {
@@ -71,16 +80,23 @@ export default function Dashboard() {
       maximumFractionDigits: 2,
     }).format(price);
 
-  const formatDate = (timestamp: number) => {
+  const formatDate = (timestamp: number, displayYear?: boolean) => {
     const date = new Date(timestamp * 1000);
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
+      year: displayYear ? "numeric" : undefined,
     });
   };
 
+  const formatXAxisDate = (timestamp: number) => {
+    return formatDate(timestamp, false);
+  };
+
   const highestPeriodPrice = kpiData?.highestPeriodPrice || 0;
+  const highestPeriodPriceTimestamp = kpiData?.highestPeriodPriceTimestamp || 0;
   const lowestPeriodPrice = kpiData?.lowestPeriodPrice || 0;
+  const lowestPeriodPriceTimestamp = kpiData?.lowestPeriodPriceTimestamp || 0;
   const currentPrice = kpiData?.currentPrice || 0;
   const priceChange = kpiData?.priceChange || 0;
 
@@ -97,99 +113,135 @@ export default function Dashboard() {
           <CardDescription>ETH price over time</CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer
-            config={chartConfig}
-            className="h-[40vh] min-h-[300px] w-full"
-          >
-            <LineChart
-              data={data}
-              margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
-              accessibilityLayer
+          {isLoading || !data ? (
+            <Skeleton className="h-[300px] w-full" />
+          ) : (
+            <ChartContainer
+              config={chartConfig}
+              className="h-[40vh] min-h-[300px] w-full"
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tick={{ fill: "hsl(var(--muted-foreground))" }}
-                domain={[minValue, maxValue]}
-                ticks={getPriceTicks()}
-                tickFormatter={(value) =>
-                  new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  }).format(value)
-                }
-              />
-              <XAxis
-                dataKey="time"
-                tickFormatter={formatDate}
-                tickLine={false}
-                axisLine={false}
-                interval="preserveStartEnd"
-                ticks={getDistributedDates(data)}
-                tick={{ fill: "hsl(var(--muted-foreground))" }}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Line
-                type="monotone"
-                dataKey="close"
-                stroke="hsl(var(--chart-1))"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ChartContainer>
+              <LineChart
+                data={data}
+                margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                accessibilityLayer
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                  domain={[minValue, maxValue]}
+                  ticks={getPriceTicks()}
+                  tickFormatter={(value) =>
+                    new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(value)
+                  }
+                />
+                <XAxis
+                  dataKey="time"
+                  tickFormatter={formatXAxisDate}
+                  tickLine={false}
+                  axisLine={false}
+                  interval="preserveStartEnd"
+                  ticks={getDistributedDates(data)}
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line
+                  type="monotone"
+                  dataKey="close"
+                  stroke="hsl(var(--chart-1))"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ChartContainer>
+          )}
         </CardContent>
       </Card>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Current Price</CardTitle>
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {formatPrice(currentPrice)}
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              {priceChange >= 0 ? (
-                <TrendingUp className="h-4 w-4 text-green-500" />
-              ) : (
-                <TrendingDown className="h-4 w-4 text-red-500" />
-              )}
-              <span
-                className={`text-sm ${
-                  priceChange >= 0 ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {Math.abs(priceChange).toFixed(2)}%
-              </span>
-            </div>
+            {isLoading || !data ? (
+              <Skeleton className="h-[300px] w-full" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold">
+                  {formatPrice(currentPrice)}
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  {priceChange >= 0 ? (
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4 text-red-500" />
+                  )}
+                  <span
+                    className={`text-sm ${
+                      priceChange >= 0 ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {Math.abs(priceChange).toFixed(2)}%
+                  </span>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Period High</CardTitle>
+            <MoveUpRight className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">
-              {formatPrice(highestPeriodPrice)}
-            </div>
+            {isLoading || !data ? (
+              <Skeleton className="h-[300px] w-full" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-green-500">
+                  {formatPrice(highestPeriodPrice)}
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <CalendarPlus className="h-4 w-4 text-muted-foreground" />
+                  <span className={`text-sm text-muted-foreground`}>
+                    {formatDate(highestPeriodPriceTimestamp, true)}
+                  </span>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Period Low</CardTitle>
+            <MoveDownRight className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-500">
-              {formatPrice(lowestPeriodPrice)}
-            </div>
+            {isLoading || !data ? (
+              <Skeleton className="h-[300px] w-full" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-red-500">
+                  {formatPrice(lowestPeriodPrice)}
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <CalendarMinus className="h-4 w-4 text-muted-foreground" />
+                  <span className={`text-sm text-muted-foreground`}>
+                    {formatDate(lowestPeriodPriceTimestamp, true)}
+                  </span>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

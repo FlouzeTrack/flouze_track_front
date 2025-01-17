@@ -19,4 +19,3 @@ export interface CryptoKpiResult {
   kpiError: string | null;
   refetch: () => Promise<void>;
 }
-
