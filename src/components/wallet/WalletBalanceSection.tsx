@@ -9,8 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 interface WalletBalanceSectionProps {
   data: FormattedBalance[];
@@ -18,6 +19,12 @@ interface WalletBalanceSectionProps {
   error: string | null;
   walletId: string;
   dateRange: { from: Date; to: Date };
+  favoriteWallets: Array<{
+    id: string;
+    walletAddress: string;
+    name: string;
+  }>;
+  favoritesIsLoading: boolean;
 }
 
 export function WalletBalanceSection({
@@ -26,7 +33,29 @@ export function WalletBalanceSection({
   error,
   walletId,
   dateRange,
+  favoriteWallets,
+  favoritesIsLoading
 }: WalletBalanceSectionProps) {
+  if (!isLoading && data.length === 0 && !error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>ETH Balance History</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px] flex flex-col justify-center">
+          <Alert variant="default">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>No balance data available</AlertTitle>
+            <AlertDescription>
+              No ETH balance data found for this wallet between{" "}
+              {format(dateRange.from, "PP")} and {format(dateRange.to, "PP")}.
+              Try selecting a different date range.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading || data.length === 0) {
     return (

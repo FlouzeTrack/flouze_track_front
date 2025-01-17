@@ -15,12 +15,20 @@ interface WalletPriceSectionProps {
   data: WalletPriceResponse | null;
   isLoading: boolean;
   error: string | null;
+  favoriteWallets: Array<{
+    id: string;
+    walletAddress: string;
+    name: string;
+  }>;
+  favoritesIsLoading: boolean;
 }
 
 export function WalletPriceSection({
   data,
   isLoading,
   error,
+  favoriteWallets,
+  favoritesIsLoading
 }: WalletPriceSectionProps) {
   return (
     <Card>
