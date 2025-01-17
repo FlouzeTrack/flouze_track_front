@@ -4,7 +4,6 @@ import {
   BalanceHistoryResponse,
   FormattedBalance,
 } from "@/types/ethereumBalancesData";
-import ApiErrorResponse from "@/types/api";
 import { EthereumMapper } from "@/mappers/ethereumMapper";
 
 interface WalletBalanceParams {
@@ -12,24 +11,38 @@ interface WalletBalanceParams {
   endDate: string;
 }
 
+interface WalletBalanceOptions {
+  enabled?: boolean;
+  delay?: number;
+  previousRequestFailed?: boolean;
+}
+
 interface WalletBalanceResult {
   data: FormattedBalance[];
   isLoading: boolean;
   error: string | null;
+  isSuccess: boolean;
   refetch: () => Promise<void>;
 }
 
 export const useWalletBalance = (
   walletId: string,
-  params: WalletBalanceParams
+  params: WalletBalanceParams,
+  options: WalletBalanceOptions = {}
 ): WalletBalanceResult => {
   const [data, setData] = useState<FormattedBalance[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
+
+      if (options.delay) {
+        await new Promise((resolve) => setTimeout(resolve, options.delay));
+      }
+
       const urlParams = new URLSearchParams();
       urlParams.append("startDate", params.startDate);
       urlParams.append("endDate", params.endDate);
@@ -46,27 +59,31 @@ export const useWalletBalance = (
 
       setData(formattedData);
       setError(null);
+      setIsSuccess(true);
     } catch (err: any) {
-      console.error("Failed to fetch data:", err);
-      const errorResponse = err.response?.data as ApiErrorResponse;
-
-      const errorMessage = errorResponse
-        ? `${errorResponse.error}${
-            errorResponse.errors
-              ? " - " + errorResponse.errors.map((e) => e.message).join(", ")
-              : ""
-          }`
-        : "Failed to fetch data";
-
-      setError(errorMessage);
+      setError(err.message || "Failed to fetch data");
+      setIsSuccess(false);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Reset states when dependencies change
   useEffect(() => {
-    fetchData();
+    setData([]);
+    setError(null);
+    setIsSuccess(false);
+    setIsLoading(false);
   }, [walletId, params.startDate, params.endDate]);
 
-  return { data, isLoading, error, refetch: fetchData };
+  // Handle the actual data fetching
+  useEffect(() => {
+    if (!options.enabled) {
+      return;
+    }
+
+    fetchData();
+  }, [options.enabled]);
+
+  return { data, isLoading, error, isSuccess, refetch: fetchData };
 };
