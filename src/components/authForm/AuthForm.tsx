@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldValues, UseFormReturn, FieldErrors, Path } from "react-hook-form";
 import { Bitcoin, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface Field<V> {
   label: string;
@@ -49,11 +49,16 @@ export default function AuthForm<V extends FieldValues>({
 }: AuthFormProps<V>) {
   const orderClasses = reverseGrid ? "lg:order-last" : "lg:order-first";
 
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const passwordVisibilityRefs = useRef<{ [key: string]: boolean }>({});
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
+  const togglePasswordVisibility = (id: string) => {
+    passwordVisibilityRefs.current[id] = !passwordVisibilityRefs.current[id];
+    setIsPasswordVisible({ ...passwordVisibilityRefs.current });
   };
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   return (
     <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
@@ -88,7 +93,7 @@ export default function AuthForm<V extends FieldValues>({
                       id={field.id}
                       className={"bg-background"}
                       type={
-                        field.type === "password" && isPasswordVisible
+                        field.type === "password" && isPasswordVisible[field.id]
                           ? "text"
                           : field.type
                       }
@@ -98,9 +103,9 @@ export default function AuthForm<V extends FieldValues>({
                     {field.type === "password" && (
                       <div
                         className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
-                        onClick={togglePasswordVisibility}
+                        onClick={() => togglePasswordVisibility(field.id)}
                       >
-                        {isPasswordVisible ? (
+                        {isPasswordVisible[field.id] ? (
                           <EyeOff size={20} />
                         ) : (
                           <Eye size={20} />
