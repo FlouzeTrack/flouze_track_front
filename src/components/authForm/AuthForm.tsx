@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldValues, UseFormReturn, FieldErrors, Path } from "react-hook-form";
-import { Bitcoin } from "lucide-react";
+import { Bitcoin, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 interface Field<V> {
   label: string;
@@ -48,6 +49,12 @@ export default function AuthForm<V extends FieldValues>({
 }: AuthFormProps<V>) {
   const orderClasses = reverseGrid ? "lg:order-last" : "lg:order-first";
 
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   return (
     <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
       <div
@@ -76,13 +83,31 @@ export default function AuthForm<V extends FieldValues>({
               {fields.map((field) => (
                 <div className="grid gap-2" key={field.id}>
                   <Label htmlFor={field.id}>{field.label}</Label>
-                  <Input
-                    id={field.id}
-                    className={"bg-background"}
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    {...form.register(field.name)}
-                  />
+                  <div className="relative">
+                    <Input
+                      id={field.id}
+                      className={"bg-background"}
+                      type={
+                        field.type === "password" && isPasswordVisible
+                          ? "text"
+                          : field.type
+                      }
+                      placeholder={field.placeholder}
+                      {...form.register(field.name)}
+                    />
+                    {field.type === "password" && (
+                      <div
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                        onClick={togglePasswordVisibility}
+                      >
+                        {isPasswordVisible ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
               <Button type="submit" className="w-full" disabled={isLoading}>
