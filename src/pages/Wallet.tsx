@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useWalletBalance } from "@/hooks/fetch/useWalletBalance";
 import { useWalletPrice } from "@/hooks/fetch/useWalletPrice";
 import { format } from "date-fns";
@@ -26,6 +26,7 @@ const Wallet = () => {
   const [favorites, setFavorites] = useState<FavoriteWallet[]>([]);
   const [isFavoritesLoading, setIsFavoritesLoading] = useState(true);
   const { dateRange } = useDateRange();
+
 
   const fetchFavorites = async () => {
     try {
@@ -107,6 +108,8 @@ const Wallet = () => {
         data={walletPriceData}
         isLoading={walletPriceIsLoading}
         error={walletPriceError}
+        favoriteWallets={favoriteWallets}
+        favoritesIsLoading={isFavoritesLoading}
       />
 
       <div className="grid grid-cols-3 gap-4">
@@ -120,6 +123,8 @@ const Wallet = () => {
               from: dateRange.from!,
               to: dateRange.to!,
             }}
+            favoriteWallets={favoriteWallets}
+            favoritesIsLoading={isFavoritesLoading}
           />
         </div>
 
