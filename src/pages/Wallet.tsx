@@ -77,7 +77,7 @@ const Wallet = () => {
       />
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2 h-full">
+        <div className="col-span-3 h-full">
           <WalletBalanceSection
             data={balanceData}
             isLoading={isBalanceLoading}
@@ -90,12 +90,12 @@ const Wallet = () => {
           />
         </div>
 
-        <div className="col-span-1 h-full">
+        {/* <div className="col-span-1 h-full">
           <TransactionsList
             walletId={walletId}
             dateRange={{ startDate: dateRange.from!, endDate: dateRange.to! }}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
