@@ -19,10 +19,8 @@ interface WalletPriceResult {
   refetch: () => Promise<void>;
 }
 
-export const DEFAULT_WALLET_ID = "0xd0b08671eC13B451823aD9bC5401ce908872e7c5";
-
 export const useWalletPrice = (
-  walletId: string = DEFAULT_WALLET_ID,
+  walletId: string,
   params: WalletPriceParams,
   options: WalletPriceOptions = {}
 ): WalletPriceResult => {

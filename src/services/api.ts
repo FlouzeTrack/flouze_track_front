@@ -42,6 +42,9 @@ const createAPI = (isAuthService = false) => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      if (config.method === "patch") {
+        config.headers["Content-Type"] = "application/json";
+      }
       return config;
     },
     (error) => Promise.reject(error)
@@ -77,7 +80,8 @@ const createAPI = (isAuthService = false) => {
           }
 
           const authUrl =
-          (import.meta as any).env.VITE_API_AUTH_URL || "http://localhost:4010/api/v1";
+            (import.meta as any).env.VITE_API_AUTH_URL ||
+            "http://localhost:4010/api/v1";
           const { data } = await axios.post(
             `${authUrl}/auth/refresh`,
             {},

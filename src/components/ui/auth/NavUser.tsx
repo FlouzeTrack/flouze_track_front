@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, ChevronRight, LogOut, Settings } from "lucide-react";
+import { Bell, ChevronRight, LogOut, Settings, UserCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -106,9 +106,9 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate("/settings")}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Paramètres</span>
+              <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <UserCircle className="mr-2 h-4 w-4" />
+                <span>Profile</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell className="mr-2 h-4 w-4" />
